@@ -61,7 +61,7 @@ Is the detail level on the displaying information.
 
 - **none** : no display
 - **error** : just error
-- **short** : just one line for each music file + error
+- **short** : just short info for each music file (tag state, db state) + error
 - **all** : all details.
 
 ### tagVersion

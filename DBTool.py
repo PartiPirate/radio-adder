@@ -28,22 +28,22 @@ class DBTool :
 				print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
 			return "ERROR"
 
-		print("ROW COUNT : ", cursor.rowcount)
+		rowCount = 0 
 
-		if cursor.rowcount <= 0 :
-			cursor.fetchall()
-			cursor.close()
+		for row in cursor.fetchall() :
+			rowCount += 1
+
+
+		if rowCount <= 0 :
 			return "NOT_IN_DB"
-		elif cursor.rowcount > 1 :
+		elif rowCount > 1 :
 			if settings.display != "none" :
-				print("\t\033[33mWARNING : multiple entry in bdd : ", cursor.statement, "\033[0m")
-			cursor.fetchall()
-			cursor.close()
+				print("\t\033[93mWARNING : multiple entry in bdd : ", cursor.statement, "\033[0m")
 			return "MULTIPLE_ENTRY"
 
-		row = cursor.fetchone()
+		#row = cursor.fetchone()
 
-		cursor.fetchall()
+		#cursor.fetchall()
 		cursor.close()
 
 		if 		row[0] != musicTrack.getTitle() :
@@ -78,14 +78,12 @@ class DBTool :
 		data = {}
 
 		data['url'] 		= musicTrack.getFileURL()
-		data['title'] 		= bytes(musicTrack.getTitle(), 'utf-8')
-		data['author'] 		= bytes(musicTrack.getAlbumArtist(), 'utf-8')
-		data['album'] 		= bytes(musicTrack.getAlbum(), 'utf-8')
+		data['title'] 		= musicTrack.getTitle()
+		data['author'] 		= musicTrack.getAlbumArtist()
+		data['album'] 		= musicTrack.getAlbum()
 		data['duration']	= musicTrack.getDuration()
-		data['genres']		= bytes(musicTrack.getGenres(), 'utf-8')
+		data['genres']		= musicTrack.getGenres()
 		data['free']		= musicTrack.isFree()
-
-		print(data)
 
 		try :
 			cursor.execute(insert_stmt, data)
@@ -95,4 +93,47 @@ class DBTool :
 
 		self.__db.commit()
 		cursor.close()
+
+	def updateMusicInDB(self, musicTrack) :
+
+		if not self.__db.is_connected() :
+			self.__db.reconnect()
+
+		cursor = self.__db.cursor()
+
+		#bytes(test, 'utf-8')
+
+		# UPDATE `MusicBot`.`tracks` SET `tra_title`='Antauparolo de Prapatra Kaciko', `tra_author`='BaRok\' Projeto', `tra_duration`='236' WHERE `tra_id`='1';
+
+
+		insert_stmt = (	
+			"UPDATE `MusicBot`.`tracks` SET "
+			"`tra_title`=%(title)s, "
+			"`tra_author`=%(author)s, "
+			"`tra_album`=%(album)s, "
+			"`tra_duration`=%(duration)s, "
+			"`tra_genres`=%(genres)s, "
+			"`tra_free`=%(free)s "
+			"WHERE `tra_url`=%(url)s ; "
+		)
+
+		data = {}
+
+		data['url'] 		= musicTrack.getFileURL()
+		data['title'] 		= musicTrack.getTitle()
+		data['author'] 		= musicTrack.getAlbumArtist()
+		data['album'] 		= musicTrack.getAlbum()
+		data['duration']	= musicTrack.getDuration()
+		data['genres']		= musicTrack.getGenres()
+		data['free']		= musicTrack.isFree()
+
+		try :
+			cursor.execute(insert_stmt, data)
+		except :
+			if settings.display != "none" :
+				print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
+
+		self.__db.commit()
+		cursor.close()
+
 

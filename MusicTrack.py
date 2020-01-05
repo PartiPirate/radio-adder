@@ -198,12 +198,19 @@ class MusicTrack :
 			#recordingID = data['results'][0]['recordings'][0]['id']
 
 			if data['status'] == "ok" :
+
+				if len(data['results']) <= 0 :
+					if settings.display != "none" :
+						print("\t\033[91mERROR : unknown music\033[0m")
+					return
+
 				for results in data['results'] :
 					if 'recordings' in results :
 						self.__mbRecordingID = [results['recordings'][0]['id']]
 
 			else :
-				print("\033[91mERROR : unknown music\033[0m")
+				if settings.display != "none" :
+					print("\t\033[91mERROR : unknown music\033[0m")
 
 	def loadMusicBrainzInfo(self) :
 
@@ -314,67 +321,69 @@ class MusicTrack :
 
 	def loadCoverURL(self) :
 
-		musicFile = taglib.File(self.__filePath) 
+		if self.__mbRecordingID != [] :
 
-		if 'COVER_URL' in musicFile.tags :
-			self.__coverURL = musicFile.tags['COVER_URL']
+			musicFile = taglib.File(self.__filePath) 
 
-		else :
+			if 'COVER_URL' in musicFile.tags :
+				self.__coverURL = musicFile.tags['COVER_URL']
 
-			if self.__mbReleaseID != "" :
-				infoCoverURL = "https://ia801900.us.archive.org/13/items/mbid-" + self.__mbReleaseID[0] + "/index.json"
+			else :
 
-				#print("url : ", infoCoverURL)
+				if self.__mbReleaseID != "" :
+					infoCoverURL = "https://ia801900.us.archive.org/13/items/mbid-" + self.__mbReleaseID[0] + "/index.json"
 
-				infoCoverResponse = requests.get(infoCoverURL)
+					#print("url : ", infoCoverURL)
 
-				if infoCoverResponse.status_code == 200 :
+					infoCoverResponse = requests.get(infoCoverURL)
 
-					infoJSON = infoCoverResponse.json()
+					if infoCoverResponse.status_code == 200 :
 
-					infoImage = None ;
+						infoJSON = infoCoverResponse.json()
 
-					if 'images' in infoJSON :
-						for image in infoJSON['images'] :
-							if 'types' in image :
-								for types in image['types'] :
-									if types == "Front" :
-										infoImage = image
-										break
+						infoImage = None ;
 
-					
-					if infoImage != None :
-						startCoverURL = ""
+						if 'images' in infoJSON :
+							for image in infoJSON['images'] :
+								if 'types' in image :
+									for types in image['types'] :
+										if types == "Front" :
+											infoImage = image
+											break
 
-						#print(json.dumps(infoImage, sort_keys=True, indent=4))
+						
+						if infoImage != None :
+							startCoverURL = ""
 
-						if 'thumbnails' in infoImage :
-							if   'small' in infoImage['thumbnails'] :
-								startCoverURL = infoImage['thumbnails']['small']
-							elif '250' in infoImage['thumbnails'] :
-								startCoverURL = infoImage['thumbnails']['250']
-							elif 'large' in infoImage['thumbnails'] :
-								startCoverURL = infoImage['thumbnails']['large']
-							elif '500' in infoImage['thumbnails'] :
-								startCoverURL = infoImage['thumbnails']['500']
+							#print(json.dumps(infoImage, sort_keys=True, indent=4))
 
-						if startCoverURL == "" and 'image' in infoImage :
-							startCoverURL = infoImage['image']
+							if 'thumbnails' in infoImage :
+								if   'small' in infoImage['thumbnails'] :
+									startCoverURL = infoImage['thumbnails']['small']
+								elif '250' in infoImage['thumbnails'] :
+									startCoverURL = infoImage['thumbnails']['250']
+								elif 'large' in infoImage['thumbnails'] :
+									startCoverURL = infoImage['thumbnails']['large']
+								elif '500' in infoImage['thumbnails'] :
+									startCoverURL = infoImage['thumbnails']['500']
 
-						if startCoverURL != "" :
-							startCoverURLResponse = requests.get(startCoverURL)
+							if startCoverURL == "" and 'image' in infoImage :
+								startCoverURL = infoImage['image']
 
-							if startCoverURLResponse.status_code == 200 :
-								self.__coverURL = [startCoverURLResponse.url] # get final URL through redirect
+							if startCoverURL != "" :
+								startCoverURLResponse = requests.get(startCoverURL)
 
-							else :
-								if settings.display != "none" :
-									print("\t\033[91mERROR : get final cover URL return ", startCoverURLResponse.url, "\033[0m")
+								if startCoverURLResponse.status_code == 200 :
+									self.__coverURL = [startCoverURLResponse.url] # get final URL through redirect
+
+								else :
+									if settings.display != "none" :
+										print("\t\033[91mERROR : get final cover URL return ", startCoverURLResponse.url, "\033[0m")
 
 
-				else : 
-					if settings.display != "none" :
-						print("\t\033[91mERROR : load cover info return ", infoCoverResponse.status_code, " (url:", infoCoverURL, ")\033[0m")
+					else : 
+						if settings.display != "none" :
+							print("\t\033[93mWARNING : no cover (", infoCoverResponse.status_code, " - url:", infoCoverURL, ")\033[0m")
 
 	def isAlreadyTag(self) :
 

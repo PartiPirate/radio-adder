@@ -35,11 +35,11 @@ for track in result :
 		print("file ", end='')
 		print(i, end='/')
 		print(len(result), end=' : ')
-		print(track.getFilePath(), end='')
+		print(track.getFilePath())
 
 	if not track.isAlreadyTag() :
 		if settings.display != "none" and settings.display != "error" :
-			print("\033[92m TAG\033[0m")
+			print("\t\033[92mTAG SET\033[0m")
 
 		track.identify()
 		track.loadMusicBrainzInfo()
@@ -50,14 +50,24 @@ for track in result :
 		
 	else :
 		if settings.display != "none" and settings.display != "error" :
-			print("\033[96m SKIP\033[0m")
+			print("\t\033[96mTAG SKIP\033[0m")
 
 	musicDBInfo = dbTool.getMusicDBInfo(track)
 
-	print("DBInfo : ", musicDBInfo)
-
-	if musicDBInfo == "NOT_IN_DB" :
+	if   musicDBInfo == "NOT_IN_DB" :
 		dbTool.addMusicInDB(track)
+		if settings.display != "none" and settings.display != "error" :
+			print("\t\033[92mDB ADD\033[0m")
+
+	elif musicDBInfo == "NEED_UPDATE" :
+		dbTool.updateMusicInDB(track)
+		if settings.display != "none" and settings.display != "error" :
+			print("\t\033[95mDB UPDATE\033[0m")
+
+	else :
+		if settings.display != "none" and settings.display != "error" :
+			print("\t\033[96mDB SKIP\033[0m")
+
 
 	if settings.display == "all" :
 		track.print()
