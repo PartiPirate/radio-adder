@@ -1,0 +1,3 @@
+pytaglib
+pyacoustid
+mysql-connector-python
