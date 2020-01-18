@@ -150,6 +150,8 @@ class MusicTrack :
 				output += ", "
 
 			output += title
+
+			first = False
 		
 		return output ;
 
