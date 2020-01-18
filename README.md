@@ -10,7 +10,7 @@ to read and write the audio tags (mp3, flac, ...)
 	
 `pip3 install pytaglib`
 or
-`apt install python3-pip`
+`apt install python3-taglib`
 
 ### [pyacoustid](https://pypi.org/project/pyacoustid/)
 
