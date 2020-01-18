@@ -6,10 +6,10 @@ class DBTool :
 
 	def __init__(self) :
 
-		self.__db = mysql.connector.connect(	host="localhost",  		# your host 
-                     							user="alex",       		# username
-                     							passwd="Mp607bdQ@?",    # password
-                     							db="MusicBot")   		# name of the database
+		self.__db = mysql.connector.connect(	host=settings.bddHost,  		# your host 
+                     							user=settings.bdduser,       	# username
+                     							passwd=settings.bddPassword,    # password
+                     							db=settings.bddName)   			# name of the database
 
 	def getMusicDBInfo(self, musicTrack) :
 
