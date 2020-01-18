@@ -18,7 +18,7 @@ class DBTool :
 
 		cursor = self.__db.cursor()
 
-		operation = "SELECT tra_title, tra_author, tra_album, tra_duration, tra_genres, tra_free FROM MusicBot.tracks WHERE tra_url LIKE %(url)s ;"
+		operation = "SELECT tra_title, tra_author, tra_album, tra_duration, tra_genres, tra_free FROM tracks WHERE tra_url LIKE %(url)s ;"
 		params = { 'url': musicTrack.getFileURL() }
 
 		try :
@@ -71,7 +71,7 @@ class DBTool :
 		#bytes(test, 'utf-8')
 
 		insert_stmt = (	
-			"INSERT INTO MusicBot.tracks (tra_url, tra_title, tra_author, tra_album, tra_duration, tra_genres, tra_free) "
+			"INSERT INTO tracks (tra_url, tra_title, tra_author, tra_album, tra_duration, tra_genres, tra_free) "
 			"VALUES (%(url)s, %(title)s, %(author)s, %(album)s, %(duration)s, %(genres)s, %(free)s) ;"
 		)
 
@@ -103,11 +103,11 @@ class DBTool :
 
 		#bytes(test, 'utf-8')
 
-		# UPDATE `MusicBot`.`tracks` SET `tra_title`='Antauparolo de Prapatra Kaciko', `tra_author`='BaRok\' Projeto', `tra_duration`='236' WHERE `tra_id`='1';
+		# UPDATE `tracks` SET `tra_title`='Antauparolo de Prapatra Kaciko', `tra_author`='BaRok\' Projeto', `tra_duration`='236' WHERE `tra_id`='1';
 
 
 		insert_stmt = (	
-			"UPDATE `MusicBot`.`tracks` SET "
+			"UPDATE `tracks` SET "
 			"`tra_title`=%(title)s, "
 			"`tra_author`=%(author)s, "
 			"`tra_album`=%(album)s, "
