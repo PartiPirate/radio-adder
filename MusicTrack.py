@@ -335,7 +335,7 @@ class MusicTrack :
 
 			else :
 
-				if self.__mbReleaseID != "" :
+				if self.__mbReleaseID != [] and len(self.__mbReleaseID) > 0 :
 					infoCoverURL = "https://ia801900.us.archive.org/13/items/mbid-" + self.__mbReleaseID[0] + "/index.json"
 
 					#print("url : ", infoCoverURL)
