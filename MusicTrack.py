@@ -445,6 +445,7 @@ class MusicTrack :
 	def print(self) :
 
 		print("\tFILE PATH : ",						self.__filePath)
+		print("\tFILE URL : ",						self.getFileURL())
 		print("\tALBUM ARTIST : ", 					self.__albumArtist)
 		print("\tARTISTS : ", 						self.__artists)
 		print("\tALBUM : ", 						self.__album)
