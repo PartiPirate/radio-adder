@@ -7,6 +7,7 @@ import datetime
 import json
 import settings
 import urllib.parse
+import re
 
 class MusicTrack :
 
@@ -278,19 +279,17 @@ class MusicTrack :
 
 						elif 'date' in release :
 
-							date = release['date']
+							date = re.sub('[^0-9]+', '', release['date'])
 
-							if len(date) == 10 :
-								date = date.split('-')
-								year = int(date[0])
-								mounth = int(date[1])
-								day = int(date[2])
+							if len(date) == 8 :
+								year = int(date[0:4])
+								mounth = int(date[4:6])
+								day = int(date[6:8])
 								date = datetime.date(year, mounth, day)
 
-							elif len(date) == 7 :
-								date = date.split('-')
-								year = int(date[0])
-								mounth = int(date[1])
+							elif len(date) == 6 :
+								year = int(date[0:4])
+								mounth = int(date[4:6])
 								date = datetime.date(year, mounth, 28)
 
 							elif len(date) == 4 :
