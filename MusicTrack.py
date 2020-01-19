@@ -279,7 +279,7 @@ class MusicTrack :
 								date = datetime.date(int(date), 12, 31)
 
 							else :
-								date = datetime.today()
+								date = datetime.date.today()
 
 							if date < oldestDate :
 								oldestDate = date 
