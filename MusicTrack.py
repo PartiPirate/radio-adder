@@ -402,6 +402,40 @@ class MusicTrack :
 		else :
 			return False
 
+	def folderSort(self, startDir) :
+
+		startDir = os.path.abspath(startDir)
+		artist 	= "Unknown"
+		album 	= "Unknown"
+		title 	= "Unknown"
+
+		fileBaseName = os.path.basename(self.__filePath)
+
+		fileExt = fileBaseName.split(".")[-1]
+
+		if self.__albumArtist != [] : 
+			artist = self.__albumArtist[0]
+
+		if self.__album != [] :
+			album = self.__album[0]
+
+		if self.__title != [] :
+			title = self.__title[0]
+
+		if self.__filePath != startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt :
+
+			if not os.path.exists(startDir+"/"+artist) :
+				os.mkdir(startDir+"/"+artist)
+
+			if not os.path.exists(startDir+"/"+artist+"/"+album) :
+				os.mkdir(startDir+"/"+artist+"/"+album)
+
+			if not os.path.exists(startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt) :
+				os.rename(self.__filePath, startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt)
+
+			self.__filePath = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
+
+
 	def tag(self) :
 
 		musicFile = taglib.File(self.__filePath) 

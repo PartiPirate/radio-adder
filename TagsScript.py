@@ -52,6 +52,8 @@ for track in result :
 		if settings.display != "none" and settings.display != "error" :
 			print("\t\033[96mTAG SKIP\033[0m")
 
+	track.folderSort(startDir)
+
 	musicDBInfo = dbTool.getMusicDBInfo(track)
 
 	if   musicDBInfo == "NOT_IN_DB" :

@@ -11,9 +11,9 @@ def searchFile(dirPath) :
 
 	fileList = os.listdir(dirPath)
 
+	os.chdir(dirPath)
+	
 	for file in fileList :
-
-		os.chdir(dirPath)
 
 		filePath = os.path.abspath(file)
 
@@ -23,6 +23,8 @@ def searchFile(dirPath) :
 		elif os.path.basename(filePath).lower().endswith(audioExt) and not os.path.basename(filePath).startswith('.') :
 			musicTrack = MusicTrack.MusicTrack(filePath)
 			musicList.append(musicTrack)
+
+	os.chdir("..")
 
 	return musicList
 
