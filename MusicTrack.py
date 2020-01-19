@@ -343,7 +343,7 @@ class MusicTrack :
 
 					OK = False
 
-					for time in xrange(1,100):
+					for tryCount in xrange(1,100):
 						try:
 							infoCoverResponse = requests.get(infoCoverURL)
 						except :
