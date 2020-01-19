@@ -221,7 +221,24 @@ class MusicTrack :
 
 			url = "http://musicbrainz.org/ws/2/recording/" + self.__mbRecordingID[0] + "?inc=artist-credits+releases+genres&fmt=json"
 
-			response = requests.get(url)
+			OK = False
+
+			for tryCount in range(1,100):
+				try:
+					response = requests.get(url)
+				except :
+					if settings.display != "none" :
+						print("\t\033[93mWARNING : cover MusicBrainz error, retry in 1 s \033[0m")
+
+					time.sleep(1)
+				else :
+					OK = True
+					break
+			
+			if not OK :
+				if settings.display != "none" :
+					print("\t\033[91mERROR : cover MusicBrainz error after 100 retry\033[0m")
+				return
 
 			if response.status_code == 200 :
 
@@ -343,7 +360,7 @@ class MusicTrack :
 
 					OK = False
 
-					for tryCount in xrange(1,100):
+					for tryCount in range(1,100):
 						try:
 							infoCoverResponse = requests.get(infoCoverURL)
 						except :
