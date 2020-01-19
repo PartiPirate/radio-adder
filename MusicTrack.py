@@ -1,5 +1,6 @@
 import os
 import taglib
+import time
 import acoustid
 import requests
 import datetime
@@ -340,7 +341,23 @@ class MusicTrack :
 
 					#print("url : ", infoCoverURL)
 
-					infoCoverResponse = requests.get(infoCoverURL)
+					OK = False
+
+					for time in xrange(1,100):
+						try:
+							infoCoverResponse = requests.get(infoCoverURL)
+						except :
+							time.sleep(1)
+							continue
+
+						OK = True
+						break
+					
+					if not OK :
+						if settings.display != "none" :
+							print("\t\033[91mERROR : cover request\033[0m")
+						return
+
 
 					if infoCoverResponse.status_code == 200 :
 
