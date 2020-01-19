@@ -1,7 +1,7 @@
 import os
 import MusicTrack
 
-audioExt = ('mp3', 'flac')
+audioExt = ('mp3', 'flac', 'ogg')
 
 def searchFile(dirPath) :
 
@@ -20,7 +20,7 @@ def searchFile(dirPath) :
 		if os.path.isdir(filePath) :
 			musicList += searchFile(filePath)
 
-		elif os.path.basename(filePath).lower().endswith(audioExt) :
+		elif os.path.basename(filePath).lower().endswith(audioExt) and not os.path.basename(filePath).startswith('.') :
 			musicTrack = MusicTrack.MusicTrack(filePath)
 			musicList.append(musicTrack)
 
