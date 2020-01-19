@@ -273,7 +273,7 @@ class MusicTrack :
 								date = date.split('-')
 								year = int(date[0])
 								mounth = int(date[1])
-								date = datetime.date(year, mounth, 31)
+								date = datetime.date(year, mounth, 28)
 
 							elif len(date) == 4 :
 								date = datetime.date(int(date), 12, 31)
