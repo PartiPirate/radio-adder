@@ -347,15 +347,17 @@ class MusicTrack :
 						try:
 							infoCoverResponse = requests.get(infoCoverURL)
 						except :
-							time.sleep(1)
-							continue
+							if settings.display != "none" :
+								print("\t\033[93mWARNING : cover request error, retry in 1 s \033[0m")
 
-						OK = True
-						break
+							time.sleep(1)
+						else :
+							OK = True
+							break
 					
 					if not OK :
 						if settings.display != "none" :
-							print("\t\033[91mERROR : cover request\033[0m")
+							print("\t\033[91mERROR : cover request error after 100 retry\033[0m")
 						return
 
 
