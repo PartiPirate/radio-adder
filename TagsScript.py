@@ -76,5 +76,6 @@ for track in result :
 
 	#print("\tFILE URL : ", track.getFileURL())
 
+searchFile.clearDir(startDir)
 
 #print("FILE : "+result[0].getFilePath())
