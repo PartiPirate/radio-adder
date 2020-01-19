@@ -277,6 +277,9 @@ class MusicTrack :
 
 							elif len(date) == 4 :
 								date = datetime.date(int(date), 12, 31)
+								
+							else
+								date = datetime.today()
 
 							if date < oldestDate :
 								oldestDate = date 
