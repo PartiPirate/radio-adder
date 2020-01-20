@@ -285,11 +285,31 @@ class MusicTrack :
 								year = int(date[0:4])
 								mounth = int(date[4:6])
 								day = int(date[6:8])
+
+								if mounth > 12 :
+									mounth = 12
+
+								if mounth < 1 :
+									mounth = 1
+
+								if day > 31 :
+									day = 31
+
+								if day < 1 :
+									day = 1
+
 								date = datetime.date(year, mounth, day)
 
 							elif len(date) == 6 :
 								year = int(date[0:4])
 								mounth = int(date[4:6])
+
+								if mounth > 12 :
+									mounth = 12
+
+								if mounth < 1 :
+									mounth = 1
+
 								date = datetime.date(year, mounth, 28)
 
 							elif len(date) == 4 :
