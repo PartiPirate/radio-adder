@@ -469,13 +469,13 @@ class MusicTrack :
 		fileExt = fileBaseName.split(".")[-1]
 
 		if self.__albumArtist != [] : 
-			artist = self.__albumArtist[0]
+			artist = self.__albumArtist[0].replace("/", "")
 
 		if self.__album != [] :
-			album = self.__album[0]
+			album = self.__album[0].replace("/", "")
 
 		if self.__title != [] :
-			title = self.__title[0]
+			title = self.__title[0].replace("/", "")
 
 		fileName = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
 
