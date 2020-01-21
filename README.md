@@ -44,7 +44,7 @@ to get the type of the files, and check if is a music file.
 
 ## Use
 
-`./radio-adder.py [Directory]`
+`./TagsScript.py [Directory]`
 
 `[Directory]` : the music directory 
 
