@@ -18,7 +18,7 @@ class DBTool :
 
 		cursor = self.__db.cursor()
 
-		operation = "SELECT tra_title, tra_author, tra_album, tra_duration, tra_genres, tra_free FROM tracks WHERE tra_url LIKE %(url)s ;"
+		operation = "SELECT tra_title, tra_author, tra_album, tra_duration, tra_genres, tra_free FROM tracks WHERE tra_url = %(url)s ;"
 		params = { 'url': musicTrack.getFileURL() }
 
 		try :

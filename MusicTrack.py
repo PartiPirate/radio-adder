@@ -57,6 +57,37 @@ class MusicTrack :
 					if trackStr[0] != "" and trackStr[1] != "" :
 						self.__trackNum 	= int(trackStr[0])
 						self.__trackCount 	= int(trackStr[1])
+		elif self.__audioFormat == "audio/x-flac" or self.__audioFormat == "audio/ogg" :
+
+			if 'DISCNUMBER' in musicFile.tags and musicFile.tags['DISCNUMBER'] != [] :
+				discNum = re.sub('[^0-9]+', '', musicFile.tags['DISCNUMBER'][0])
+				if discNum != "" :
+					self.__discNum = int(discNum)
+
+			if 'DISCTOTAL' in musicFile.tags and musicFile.tags['DISCTOTAL'] != [] :
+				discCount = re.sub('[^0-9]+', '', musicFile.tags['DISCTOTAL'][0])
+				if discCount != "" :
+					self.__discCount = int(discCount)
+
+			elif 'TOTALDISCS' in musicFile.tags and musicFile.tags['TOTALDISCS'] != [] :
+				discCount = re.sub('[^0-9]+', '', musicFile.tags['TOTALDISCS'][0])
+				if discCount != "" :
+					self.__discCount = int(discCount)
+
+			if 'TRACKNUMBER' in musicFile.tags and musicFile.tags['TRACKNUMBER'] != [] :
+				trackNum = re.sub('[^0-9]+', '', musicFile.tags['TRACKNUMBER'][0])
+				if trackNum != "" :
+					self.__trackNum = int(trackNum)
+
+			if 'TOTALTRACKS' in musicFile.tags and musicFile.tags['TOTALTRACKS'] != [] :
+				trackCount = re.sub('[^0-9]+', '', musicFile.tags['TOTALTRACKS'][0])
+				if trackCount != "" :
+					self.__trackCount = int(trackCount)
+
+			elif 'TRACKTOTAL' in musicFile.tags and musicFile.tags['TRACKTOTAL'] != [] :
+				trackCount = re.sub('[^0-9]+', '', musicFile.tags['TRACKTOTAL'][0])
+				if trackCount != "" :
+					self.__trackCount = int(trackCount)
 
 		if 'MUSICBRAINZ_TRACKID' in musicFile.tags :
 			self.__mbRecordingID = musicFile.tags['MUSICBRAINZ_TRACKID']
@@ -357,6 +388,21 @@ class MusicTrack :
 
 			if self.__discNum != 0 and self.__discCount != 0 :
 				musicFile.tags['DISCNUMBER'] = [str(self.__discNum)+"/"+str(self.__discCount)]
+
+		elif self.__audioFormat == "audio/x-flac" or self.__audioFormat == "audio/ogg" :
+			if self.__discNum != 0 :
+				musicFile.tags['DISCNUMBER'] = [str(self.__discNum)]
+
+			if self.__discCount != 0 :
+				musicFile.tags['DISCTOTAL']  = [str(self.__discCount)]
+				musicFile.tags['TOTALDISCS'] = [str(self.__discCount)]
+
+			if self.__trackNum != 0 :
+				musicFile.tags['TRACKNUMBER'] = [str(self.__trackNum)]
+
+			if self.__trackCount != 0 :
+				musicFile.tags['TOTALTRACKS'] = [str(self.__trackCount)]
+				musicFile.tags['TRACKTOTAL']  = [str(self.__trackCount)]
 
 		musicFile.save()
 
@@ -725,7 +771,18 @@ class MusicTrack :
 		if self.__title != [] :
 			title = self.__title[0].replace("/", "")
 
-		fileName = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
+
+		fileName = 	startDir
+		fileName += "/"+artist
+		fileName += "/"+album+"/"
+
+		if self.__discNum != 0 :
+			fileName += str(self.__discNum) + "."
+
+		if self.__trackNum != 0 :
+			fileName += str(self.__trackNum) + " - "
+
+		fileName += title+"."+fileExt
 
 		if self.__filePath != fileName :
 
@@ -746,7 +803,16 @@ class MusicTrack :
 				i=2
 
 				while True:
-					fileName = folderName+"/"+title+" ("+str(i)+")."+fileExt
+
+					fileName = folderName+"/"
+
+					if self.__discNum != 0 :
+						fileName += str(self.__discNum) + "."
+
+					if self.__trackNum != 0 :
+						fileName += str(self.__trackNum) + " - "
+
+					fileName += title+" ("+str(i)+")."+fileExt
 
 					if self.__filePath == fileName :
 						break
