@@ -1,11 +1,13 @@
 import os
 import taglib
+import time
 import acoustid
 import requests
 import datetime
 import json
 import settings
 import urllib.parse
+import re
 
 class MusicTrack :
 
@@ -220,7 +222,24 @@ class MusicTrack :
 
 			url = "http://musicbrainz.org/ws/2/recording/" + self.__mbRecordingID[0] + "?inc=artist-credits+releases+genres&fmt=json"
 
-			response = requests.get(url)
+			OK = False
+
+			for tryCount in range(1,100):
+				try:
+					response = requests.get(url)
+				except :
+					if settings.display != "none" :
+						print("\t\033[93mWARNING : cover MusicBrainz error, retry in 1 s \033[0m")
+
+					time.sleep(1)
+				else :
+					OK = True
+					break
+			
+			if not OK :
+				if settings.display != "none" :
+					print("\t\033[91mERROR : cover MusicBrainz error after 100 retry\033[0m")
+				return
 
 			if response.status_code == 200 :
 
@@ -260,19 +279,37 @@ class MusicTrack :
 
 						elif 'date' in release :
 
-							date = release['date']
+							date = re.sub('[^0-9]+', '', release['date'])
 
-							if len(date) == 10 :
-								date = date.split('-')
-								year = int(date[0])
-								mounth = int(date[1])
-								day = int(date[2])
+							if len(date) == 8 :
+								year = int(date[0:4])
+								mounth = int(date[4:6])
+								day = int(date[6:8])
+
+								if mounth > 12 :
+									mounth = 12
+
+								if mounth < 1 :
+									mounth = 1
+
+								if day > 31 :
+									day = 31
+
+								if day < 1 :
+									day = 1
+
 								date = datetime.date(year, mounth, day)
 
-							elif len(date) == 7 :
-								date = date.split('-')
-								year = int(date[0])
-								mounth = int(date[1])
+							elif len(date) == 6 :
+								year = int(date[0:4])
+								mounth = int(date[4:6])
+
+								if mounth > 12 :
+									mounth = 12
+
+								if mounth < 1 :
+									mounth = 1
+
 								date = datetime.date(year, mounth, 28)
 
 							elif len(date) == 4 :
@@ -340,7 +377,25 @@ class MusicTrack :
 
 					#print("url : ", infoCoverURL)
 
-					infoCoverResponse = requests.get(infoCoverURL)
+					OK = False
+
+					for tryCount in range(1,100):
+						try:
+							infoCoverResponse = requests.get(infoCoverURL)
+						except :
+							if settings.display != "none" :
+								print("\t\033[93mWARNING : cover request error, retry in 1 s \033[0m")
+
+							time.sleep(1)
+						else :
+							OK = True
+							break
+					
+					if not OK :
+						if settings.display != "none" :
+							print("\t\033[91mERROR : cover request error after 100 retry\033[0m")
+						return
+
 
 					if infoCoverResponse.status_code == 200 :
 
