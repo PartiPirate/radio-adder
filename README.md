@@ -6,11 +6,11 @@
 
 to read and write the audio tags (mp3, flac, ...)
 
-#### Instal
-	
+#### Instal (debian / ubuntu)
+
+`apt install python3-dev libtag1-dev`
+
 `pip3 install pytaglib`
-or
-`apt install python3-taglib`
 
 ### [pyacoustid](https://pypi.org/project/pyacoustid/)
 
@@ -19,6 +19,14 @@ to identify musics.
 #### Install
 
 `pip3 install pyacoustid`
+
+### ffmpeg
+
+used by pyacoustid
+
+#### Install
+
+`apt install ffmpeg`
 
 ### [MySQL connector](https://dev.mysql.com/doc/connector-python/en/)
 
