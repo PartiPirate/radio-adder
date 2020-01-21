@@ -477,22 +477,28 @@ class MusicTrack :
 		if self.__title != [] :
 			title = self.__title[0]
 
-		if self.__filePath != startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt :
+		fileName = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
 
-			if not os.path.exists(startDir+"/"+artist) :
-				os.mkdir(startDir+"/"+artist)
+		if self.__filePath != fileName :
 
-			if not os.path.exists(startDir+"/"+artist+"/"+album) :
-				os.mkdir(startDir+"/"+artist+"/"+album)
+			folderName = startDir+"/"+artist
 
-			if not os.path.exists(startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt) :
-				os.rename(self.__filePath, startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt)
-				self.__filePath = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
+			if not os.path.exists(folderName) :
+				os.mkdir(folderName)
+
+			folderName += "/"+album
+
+			if not os.path.exists(folderName) :
+				os.mkdir(folderName)
+
+			if not os.path.exists(fileName) :
+				os.rename(self.__filePath, fileName)
+				self.__filePath = fileName
 			else :
 				i=2
 
 				while True:
-					fileName = startDir+"/"+artist+"/"+album+"/"+title+" ("+str(i)+")."+fileExt
+					fileName = folderName+"/"+title+" ("+str(i)+")."+fileExt
 
 					if self.__filePath == fileName :
 						break
