@@ -41,6 +41,8 @@ for track in result :
 
 	track.checkInfo()
 
+	track.folderSort(startDir)
+
 	musicDBInfo = dbTool.getMusicDBInfo(track)
 
 	if   musicDBInfo == "NOT_IN_DB" :
@@ -58,3 +60,9 @@ for track in result :
 
 	if settings.display == "all" :
 		track.print()
+
+	#print("\tFILE URL : ", track.getFileURL())
+
+searchFile.clearDir(startDir)
+
+#print("FILE : "+result[0].getFilePath())

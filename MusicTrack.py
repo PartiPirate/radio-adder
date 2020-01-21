@@ -632,12 +632,6 @@ class MusicTrack :
 
 			OK = False
 
-			for tryCount in range(1,100):
-				try:
-					timeSinceLastCall = time.time() - MusicTrack.__lastCoverCall
-					if timeSinceLastCall < 1.1 :
-						sleep(1.1 - timeSinceLastCall)
-
 					infoCoverResponse = requests.get(infoCoverURL)
 					MusicTrack.__lastCoverCall = time.time()
 				except :
@@ -706,5 +700,55 @@ class MusicTrack :
 
 				if settings.display != "none" :
 					print("\t\033[93mWARNING : no cover (", infoCoverResponse.status_code, " - url:", infoCoverURL, ")\033[0m")
+	
+	def folderSort(self, startDir) :
 
+		startDir = os.path.abspath(startDir)
+		artist 	= "Unknown"
+		album 	= "Unknown"
+		title 	= "Unknown"
+
+		fileBaseName = os.path.basename(self.__filePath)
+
+		fileExt = fileBaseName.split(".")[-1]
+
+		if self.__albumArtist != [] : 
+			artist = self.__albumArtist[0].replace("/", "")
+
+		if self.__album != [] :
+			album = self.__album[0].replace("/", "")
+
+		if self.__title != [] :
+			title = self.__title[0].replace("/", "")
+
+		fileName = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
+
+		if self.__filePath != fileName :
+
+			folderName = startDir+"/"+artist
+
+			if not os.path.exists(folderName) :
+				os.mkdir(folderName)
+
+			folderName += "/"+album
+
+			if not os.path.exists(folderName) :
+				os.mkdir(folderName)
+
+			if not os.path.exists(fileName) :
+				os.rename(self.__filePath, fileName)
+				self.__filePath = fileName
+			else :
+				i=2
+
+				while True:
+					fileName = folderName+"/"+title+" ("+str(i)+")."+fileExt
+
+					if self.__filePath == fileName :
+						break
+					elif not os.path.exists(fileName) :
+						os.rename(self.__filePath, fileName)
+						self.__filePath = fileName
+					else :
+						i += 1
 			
