@@ -17,8 +17,31 @@ class MusicTrack :
 
 		musicFile = taglib.File(self.__filePath)
 
+		MusicTrack.__lastMusicBrainzCall = 0
+		MusicTrack.__lastCoverCall = 0
+
 		self.__free = False
 		self.__duration = musicFile.length # in seconds
+
+		if 'MUSICBRAINZ_TRACKID' in musicFile.tags :
+			self.__mbRecordingID = musicFile.tags['MUSICBRAINZ_TRACKID']
+		else :
+			self.__mbRecordingID = []
+
+		if 'MUSICBRAINZ_ALBUMID' in musicFile.tags :
+			self.__mbReleaseID = musicFile.tags['MUSICBRAINZ_ALBUMID']
+		else :
+			self.__mbReleaseID = []
+
+		if 'MUSICBRAINZ_ALBUMARTISTID' in musicFile.tags :
+			self.__mbAlbumArtistID = musicFile.tags['MUSICBRAINZ_ALBUMARTISTID']
+		else :
+			self.__mbAlbumArtistID = []
+
+		if 'MUSICBRAINZ_ARTISTID' in musicFile.tags :
+			self.__mbArtistsID = musicFile.tags['MUSICBRAINZ_ARTISTID']
+		else :
+			self.__mbArtistsID = []
 
 		if 'ALBUMARTIST' in musicFile.tags :
 			self.__albumArtist = musicFile.tags['ALBUMARTIST']
@@ -45,25 +68,10 @@ class MusicTrack :
 		else :
 			self.__genres = []
 
-		if 'MUSICBRAINZ_TRACKID' in musicFile.tags :
-			self.__mbRecordingID = musicFile.tags['MUSICBRAINZ_TRACKID']
+		if 'LANGUAGE' in musicFile.tags :
+			self.__language = musicFile.tags['LANGUAGE']
 		else :
-			self.__mbRecordingID = []
-
-		if 'MUSICBRAINZ_ALBUMID' in musicFile.tags :
-			self.__mbReleaseID = musicFile.tags['MUSICBRAINZ_ALBUMID']
-		else :
-			self.__mbReleaseID = []
-
-		if 'MUSICBRAINZ_ALBUMARTISTID' in musicFile.tags :
-			self.__mbAlbumArtistID = musicFile.tags['MUSICBRAINZ_ALBUMARTISTID']
-		else :
-			self.__mbAlbumArtistID = []
-
-		if 'MUSICBRAINZ_ARTISTID' in musicFile.tags :
-			self.__mbArtistsID = musicFile.tags['MUSICBRAINZ_ARTISTID']
-		else :
-			self.__mbArtistsID = []
+			self.__language = []
 
 		if 'COVER_URL' in musicFile.tags :
 			self.__coverURL = musicFile.tags['COVER_URL']
@@ -189,44 +197,167 @@ class MusicTrack :
 		else :
 			return self.__mbArtistsID[0] 
 
-	def identify(self) :
+	def checkInfo(self) :
+
+		needFileTagsUpdate = False
+
+		if self.__mbRecordingID == [] :
+
+			if self.__identify() :
+				self.__mbReleaseID = []
+				self.__mbAlbumArtistID = []
+				self.__mbArtistsID = []
+				self.__albumArtist = []
+				self.__artists = []
+				self.__album = []
+				self.__title = []
+				self.__genres = []
+				self.__language = []
+				self.__coverURL = []
+
+				self.__loadMusicBrainzRecording()
+				needFileTagsUpdate = True
+
+		else :
+			if self.__title == [] :
+				self.__loadMusicBrainzRecording()
+				needFileTagsUpdate = True
+
+			elif self.__album == [] :
+				self.__loadMusicBrainzRecording()
+				needFileTagsUpdate = True
+
+			elif self.__artists == [] :
+				self.__loadMusicBrainzRecording()
+				needFileTagsUpdate = True
+
+			elif self.__albumArtist == [] :
+				self.__loadMusicBrainzRecording()
+				needFileTagsUpdate = True
+
+			elif self.__genres == [] :
+				self.__loadMusicBrainzRecording()
+				needFileTagsUpdate = True
+
+			elif self.__language == [] or ( self.__language[0] != "none" and len(self.__language[0]) > 3 ) :
+				self.__language = []
+				self.__loadMusicBrainzRecording()
+				needFileTagsUpdate = True
+
+		if self.__mbReleaseID != [] :
+			if self.__coverURL == [] :
+				self.__loadCoverURL()
+
+
+		if needFileTagsUpdate : 
+			self.__updateFileTags()
+
+
+	def print(self) :
+
+		print("\tFILE PATH : ",						self.__filePath)
+		print("\tFILE URL : ",						self.getFileURL())
+		print("\tALBUM ARTIST : ", 					self.__albumArtist)
+		print("\tARTISTS : ", 						self.__artists)
+		print("\tALBUM : ", 						self.__album)
+		print("\tTITLE : ", 						self.__title)
+		print("\tGENRES : ", 						self.__genres)
+		print("\tLANGUAGE : ", 						self.__language)
+		print("\tFREE : ", 							self.__free)
+		print("\tDURATION : ", 						self.__duration)
+		print("\tMUSICBRAINZ RECORDING ID : ", 		self.__mbRecordingID)
+		print("\tMUSICBRAINZ RELEASE ID : ", 		self.__mbReleaseID)
+		print("\tMUSICBRAINZ ARTIST ID : ", 		self.__mbArtistsID)
+		print("\tMUSICBRAINZ ALBUM ARTIST ID : ", 	self.__mbAlbumArtistID)
+		print("\tCOVER URL : ", 					self.__coverURL)
+
+
+	def __updateFileTags(self) :
 
 		musicFile = taglib.File(self.__filePath) 
 
-		if 'MUSICBRAINZ_TRACKID' in musicFile.tags :
-			self.__mbRecordingID = musicFile.tags['MUSICBRAINZ_TRACKID']
+		if self.__albumArtist != [] :
+			musicFile.tags['ALBUMARTIST'] = self.__albumArtist
 
-		else :
-			data = acoustid.match(settings.acoustIDToken, self.__filePath, parse=False)
+		if self.__artists != [] :
+			musicFile.tags['ARTISTS'] = self.__artists
 
-			#recordingID = data['results'][0]['recordings'][0]['id']
+		if self.__album != "" :
+			musicFile.tags['ALBUM'] = self.__album
 
-			if data['status'] == "ok" :
+		if self.__title != "" :
+			musicFile.tags['TITLE'] = self.__title
 
-				if len(data['results']) <= 0 :
-					if settings.display != "none" :
-						print("\t\033[91mERROR : unknown music\033[0m")
-					return
+		if self.__genres != [] :
+			musicFile.tags['GENRE'] = self.__genres
 
-				for results in data['results'] :
-					if 'recordings' in results :
-						self.__mbRecordingID = [results['recordings'][0]['id']]
+		if self.__genres != [] :
+			musicFile.tags['LANGUAGE'] = self.__language
 
-			else :
+		if self.__mbRecordingID != "" :
+			musicFile.tags['MUSICBRAINZ_TRACKID'] = self.__mbRecordingID
+
+		if self.__mbReleaseID != "" :
+			musicFile.tags['MUSICBRAINZ_ALBUMID'] = self.__mbReleaseID
+
+		if self.__mbAlbumArtistID != [] :
+			musicFile.tags['MUSICBRAINZ_ALBUMARTISTID'] = self.__mbAlbumArtistID
+
+		if self.__mbArtistsID != [] :
+			musicFile.tags['MUSICBRAINZ_ARTISTID'] = self.__mbArtistsID
+
+		if self.__coverURL != "" :
+			musicFile.tags['COVER_URL'] = self.__coverURL
+
+		musicFile.save()
+
+	def __identify(self) :
+
+		if settings.display != "none" and settings.display != "error" :
+			print("\t\033[96mIdentify track in AcoustID database\033[0m")
+
+		data = acoustid.match(settings.acoustIDToken, self.__filePath, parse=False)
+
+		#recordingID = data['results'][0]['recordings'][0]['id']
+
+		if data['status'] == "ok" :
+
+			if len(data['results']) <= 0 :
 				if settings.display != "none" :
 					print("\t\033[91mERROR : unknown music\033[0m")
+				return False
 
-	def loadMusicBrainzInfo(self) :
+			for results in data['results'] :
+				if 'recordings' in results :
+					self.__mbRecordingID = [results['recordings'][0]['id']]
+				return True
+
+		else :
+			if settings.display != "none" :
+				print("\t\033[91mERROR : unknown music\033[0m")
+			return False
+
+	def __loadMusicBrainzRecording(self) :
 
 		if self.__mbRecordingID != [] :
+
+			if settings.display != "none" and settings.display != "error" :
+				print("\t\033[92mGet track info in MusicBrainz\033[0m")
 
 			url = "http://musicbrainz.org/ws/2/recording/" + self.__mbRecordingID[0] + "?inc=artist-credits+releases+genres&fmt=json"
 
 			OK = False
 
+			## GET MusicBrainz Recording json ##
+
 			for tryCount in range(1,100):
 				try:
+					timeSinceLastCall = time.time() - MusicTrack.__lastMusicBrainzCall
+					if timeSinceLastCall < 1.1 :
+						sleep(1.1 - timeSinceLastCall)
+
 					response = requests.get(url)
+					MusicTrack.__lastMusicBrainzCall = time.time()
 				except :
 					if settings.display != "none" :
 						print("\t\033[93mWARNING : cover MusicBrainz error, retry in 1 s \033[0m")
@@ -243,19 +374,20 @@ class MusicTrack :
 
 			if response.status_code == 200 :
 
+				## Parce json ###
+
 				recordingJSON = response.json()
 
 				if 'title' in recordingJSON :
 					self.__title = [recordingJSON["title"]]
 
 				if 'genres' in recordingJSON :
-					self.__genres = []
 
 					for genre in recordingJSON['genres'] :
 						if 'name' in genre :
 							self.__genres += [genre['name']]
 
-				if 'artist-credit' in recordingJSON :
+				if 'artist-credit' in recordingJSON and ( self.__artists == [] or self.__mbArtistsID == [] ) :
 					self.__artists = []
 					self.__mbArtistsID = []
 
@@ -272,6 +404,10 @@ class MusicTrack :
 
 				if 'releases' in recordingJSON :
 					for release in recordingJSON['releases'] :
+
+						if self.__mbReleaseID != [] and 'id' in release and release['id'] != self.__mbReleaseID :
+							oldestRelease = release
+							break
 
 						if 'status' in release and release['status'] != "Official" :
 							if oldestRelease == None :
@@ -338,7 +474,14 @@ class MusicTrack :
 							if 'name' in genre :
 								self.__genres += [genre['name']]
 
-					if 'artist-credit' in oldestRelease :
+					if self.__language == [] :
+						if 'text-representation' in oldestRelease and 'language' in oldestRelease['text-representation'] :
+							self.__language = [oldestRelease['text-representation']['language']]
+						else :
+							self.__language = "none"
+
+					if 'artist-credit' in oldestRelease and ( self.__mbAlbumArtistID == [] or self.__albumArtist == [] ) :
+
 						self.__albumArtist = []
 						self.__mbAlbumArtistID = []
 
@@ -361,160 +504,93 @@ class MusicTrack :
 				if settings.display != "none" :
 					print("\t\033[91mERROR : load MusicBrainz info return ", response.status_code, "\033[0m")
 
-	def loadCoverURL(self) :
+	def __loadCoverURL(self) :
 
-		if self.__mbRecordingID != [] :
 
-			musicFile = taglib.File(self.__filePath) 
+		if settings.display != "none" and settings.display != "error" :
+			print("\t\033[92mGet album cover URL\033[0m")
 
-			if 'COVER_URL' in musicFile.tags :
-				self.__coverURL = musicFile.tags['COVER_URL']
 
-			else :
+		if self.__mbReleaseID != [] and len(self.__mbReleaseID) > 0 :
+			infoCoverURL = "https://ia801900.us.archive.org/13/items/mbid-" + self.__mbReleaseID[0] + "/index.json"
 
-				if self.__mbReleaseID != [] and len(self.__mbReleaseID) > 0 :
-					infoCoverURL = "https://ia801900.us.archive.org/13/items/mbid-" + self.__mbReleaseID[0] + "/index.json"
+			#print("url : ", infoCoverURL)
 
-					#print("url : ", infoCoverURL)
+			OK = False
 
-					OK = False
+			for tryCount in range(1,100):
+				try:
+					timeSinceLastCall = time.time() - MusicTrack.__lastCoverCall
+					if timeSinceLastCall < 1.1 :
+						sleep(1.1 - timeSinceLastCall)
 
-					for tryCount in range(1,100):
-						try:
-							infoCoverResponse = requests.get(infoCoverURL)
-						except :
-							if settings.display != "none" :
-								print("\t\033[93mWARNING : cover request error, retry in 1 s \033[0m")
+					infoCoverResponse = requests.get(infoCoverURL)
+					MusicTrack.__lastCoverCall = time.time()
+				except :
+					if settings.display != "none" :
+						print("\t\033[93mWARNING : cover request error, retry in 1 s \033[0m")
 
-							time.sleep(1)
+					time.sleep(1)
+				else :
+					OK = True
+					break
+			
+			if not OK :
+				if settings.display != "none" :
+					print("\t\033[91mERROR : cover request error after 100 retry\033[0m")
+				return
+
+
+			if infoCoverResponse.status_code == 200 :
+
+				infoJSON = infoCoverResponse.json()
+
+				infoImage = None ;
+
+				if 'images' in infoJSON :
+					for image in infoJSON['images'] :
+						if 'types' in image :
+							for types in image['types'] :
+								if types == "Front" :
+									infoImage = image
+									break
+
+				
+				if infoImage != None :
+					startCoverURL = ""
+
+					#print(json.dumps(infoImage, sort_keys=True, indent=4))
+
+					if 'thumbnails' in infoImage :
+						if   'small' in infoImage['thumbnails'] :
+							startCoverURL = infoImage['thumbnails']['small']
+						elif '250' in infoImage['thumbnails'] :
+							startCoverURL = infoImage['thumbnails']['250']
+						elif 'large' in infoImage['thumbnails'] :
+							startCoverURL = infoImage['thumbnails']['large']
+						elif '500' in infoImage['thumbnails'] :
+							startCoverURL = infoImage['thumbnails']['500']
+
+					if startCoverURL == "" and 'image' in infoImage :
+						startCoverURL = infoImage['image']
+
+					if startCoverURL != "" :
+						startCoverURLResponse = requests.get(startCoverURL)
+
+						if startCoverURLResponse.status_code == 200 :
+							self.__coverURL = [startCoverURLResponse.url] # get final URL through redirect
+
 						else :
-							OK = True
-							break
-					
-					if not OK :
-						if settings.display != "none" :
-							print("\t\033[91mERROR : cover request error after 100 retry\033[0m")
-						return
+							self.__coverURL = "no cover"
+
+							if settings.display != "none" :
+								print("\t\033[91mERROR : get final cover URL return ", startCoverURLResponse.url, "\033[0m")
 
 
-					if infoCoverResponse.status_code == 200 :
+			else : 
+				self.__coverURL = "no cover"
 
-						infoJSON = infoCoverResponse.json()
-
-						infoImage = None ;
-
-						if 'images' in infoJSON :
-							for image in infoJSON['images'] :
-								if 'types' in image :
-									for types in image['types'] :
-										if types == "Front" :
-											infoImage = image
-											break
-
-						
-						if infoImage != None :
-							startCoverURL = ""
-
-							#print(json.dumps(infoImage, sort_keys=True, indent=4))
-
-							if 'thumbnails' in infoImage :
-								if   'small' in infoImage['thumbnails'] :
-									startCoverURL = infoImage['thumbnails']['small']
-								elif '250' in infoImage['thumbnails'] :
-									startCoverURL = infoImage['thumbnails']['250']
-								elif 'large' in infoImage['thumbnails'] :
-									startCoverURL = infoImage['thumbnails']['large']
-								elif '500' in infoImage['thumbnails'] :
-									startCoverURL = infoImage['thumbnails']['500']
-
-							if startCoverURL == "" and 'image' in infoImage :
-								startCoverURL = infoImage['image']
-
-							if startCoverURL != "" :
-								startCoverURLResponse = requests.get(startCoverURL)
-
-								if startCoverURLResponse.status_code == 200 :
-									self.__coverURL = [startCoverURLResponse.url] # get final URL through redirect
-
-								else :
-									if settings.display != "none" :
-										print("\t\033[91mERROR : get final cover URL return ", startCoverURLResponse.url, "\033[0m")
-
-
-					else : 
-						if settings.display != "none" :
-							print("\t\033[93mWARNING : no cover (", infoCoverResponse.status_code, " - url:", infoCoverURL, ")\033[0m")
-
-	def isAlreadyTag(self) :
-
-		musicFile = taglib.File(self.__filePath) 
-
-		if 'TAG_VERSION' in musicFile.tags :
-			if musicFile.tags['TAG_VERSION'][0] == settings.tagVersion :
-				return True
-			else :
-				return False
-		else :
-			return False
-
-	def tag(self) :
-
-		musicFile = taglib.File(self.__filePath) 
-
-		if self.__albumArtist != [] :
-			musicFile.tags['ALBUMARTIST'] = self.__albumArtist
-
-		if self.__artists != [] :
-			musicFile.tags['ARTISTS'] = self.__artists
-
-		if self.__album != "" :
-			musicFile.tags['ALBUM'] = self.__album
-
-		if self.__title != "" :
-			musicFile.tags['TITLE'] = self.__title
-
-		if self.__genres != [] :
-			musicFile.tags['GENRE'] = self.__genres
-
-		if self.__mbRecordingID != "" :
-			musicFile.tags['MUSICBRAINZ_TRACKID'] = self.__mbRecordingID
-
-		if self.__mbReleaseID != "" :
-			musicFile.tags['MUSICBRAINZ_ALBUMID'] = self.__mbReleaseID
-
-		if self.__mbAlbumArtistID != [] :
-			musicFile.tags['MUSICBRAINZ_ALBUMARTISTID'] = self.__mbAlbumArtistID
-
-		if self.__mbArtistsID != [] :
-			musicFile.tags['MUSICBRAINZ_ARTISTID'] = self.__mbArtistsID
-
-		if self.__coverURL != "" :
-			musicFile.tags['COVER_URL'] = self.__coverURL
-
-		musicFile.tags['TAG_VERSION'] = [settings.tagVersion]
-
-		#print(musicFile.tags)
-
-		musicFile.save()
-
-	def print(self) :
-
-		print("\tFILE PATH : ",						self.__filePath)
-		print("\tFILE URL : ",						self.getFileURL())
-		print("\tALBUM ARTIST : ", 					self.__albumArtist)
-		print("\tARTISTS : ", 						self.__artists)
-		print("\tALBUM : ", 						self.__album)
-		print("\tTITLE : ", 						self.__title)
-		print("\tGENRES : ", 						self.__genres)
-		print("\tFREE : ", 							self.__free)
-		print("\tDURATION : ", 						self.__duration)
-		print("\tMUSICBRAINZ RECORDING ID : ", 		self.__mbRecordingID)
-		print("\tMUSICBRAINZ RELEASE ID : ", 		self.__mbReleaseID)
-		print("\tMUSICBRAINZ ARTIST ID : ", 		self.__mbArtistsID)
-		print("\tMUSICBRAINZ ALBUM ARTIST ID : ", 	self.__mbAlbumArtistID)
-		print("\tCOVER URL : ", 					self.__coverURL)
-
-
-
+				if settings.display != "none" :
+					print("\t\033[93mWARNING : no cover (", infoCoverResponse.status_code, " - url:", infoCoverURL, ")\033[0m")
 
 			

@@ -2,7 +2,6 @@
 
 import searchFile
 import os
-import time
 import settings
 import sys
 import DBTool
@@ -37,42 +36,25 @@ for track in result :
 		print(len(result), end=' : ')
 		print(track.getFilePath())
 
-	if not track.isAlreadyTag() :
-		if settings.display != "none" and settings.display != "error" :
-			print("\t\033[92mTAG SET\033[0m")
+#	if settings.display != "none" and settings.display != "error" :
+#		print("\t\033[92mTAG SET\033[0m")
 
-		track.identify()
-		track.loadMusicBrainzInfo()
-		track.loadCoverURL()
-		track.tag()
-
-		time.sleep(1)
-		
-	else :
-		if settings.display != "none" and settings.display != "error" :
-			print("\t\033[96mTAG SKIP\033[0m")
+	track.checkInfo()
 
 	musicDBInfo = dbTool.getMusicDBInfo(track)
 
 	if   musicDBInfo == "NOT_IN_DB" :
 		dbTool.addMusicInDB(track)
+
 		if settings.display != "none" and settings.display != "error" :
-			print("\t\033[92mDB ADD\033[0m")
+			print("\t\033[92mAdd track in database\033[0m")
 
 	elif musicDBInfo == "NEED_UPDATE" :
 		dbTool.updateMusicInDB(track)
-		if settings.display != "none" and settings.display != "error" :
-			print("\t\033[95mDB UPDATE\033[0m")
 
-	else :
 		if settings.display != "none" and settings.display != "error" :
-			print("\t\033[96mDB SKIP\033[0m")
+			print("\t\033[95mUpdate track in database\033[0m")
 
 
 	if settings.display == "all" :
 		track.print()
-
-	#print("\tFILE URL : ", track.getFileURL())
-
-
-#print("FILE : "+result[0].getFilePath())
