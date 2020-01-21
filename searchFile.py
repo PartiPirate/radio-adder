@@ -26,7 +26,7 @@ def searchFile(dirPath) :
 			fileType = filetype.guess(filePath) ;
 
 			if fileType is not None and fileType.mime in audioType :
-				musicTrack = MusicTrack.MusicTrack(filePath)
+				musicTrack = MusicTrack.MusicTrack(filePath, fileType.mime)
 				musicList.append(musicTrack)
 	
 

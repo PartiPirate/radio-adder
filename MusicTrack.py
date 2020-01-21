@@ -11,17 +11,54 @@ import re
 
 class MusicTrack :
 
-	def __init__(self, path) :
+	def __init__(self, path, audioFormat) :
 
 		self.__filePath = os.path.abspath(path)
 
 		musicFile = taglib.File(self.__filePath)
 
+		print(musicFile.tags)
+
 		MusicTrack.__lastMusicBrainzCall = 0
 		MusicTrack.__lastCoverCall = 0
 
+		self.__audioFormat = audioFormat ;
+
 		self.__free = False
 		self.__duration = musicFile.length # in seconds
+
+		self.__discNum 	 	= 0
+		self.__discCount 	= 0
+
+		self.__trackNum 	= 0
+		self.__trackCount 	= 0
+
+		if self.__audioFormat == "audio/mpeg" :
+			if 'DISCNUMBER' in musicFile.tags and musicFile.tags['DISCNUMBER'] != [] :
+				discStr = musicFile.tags['DISCNUMBER'][0]
+
+				discStr = discStr.split("/")
+				
+				if len(discStr) == 2 :
+					discStr[0] = re.sub('[^0-9]+', '', discStr[0])
+					discStr[1] = re.sub('[^0-9]+', '', discStr[1])
+
+					if discStr[0] != "" and discStr[1] != "" :
+						self.__discNum 		= int(discStr[0])
+						self.__discCount 	= int(discStr[1])
+
+			if 'TRACKNUMBER' in musicFile.tags :
+				trackStr = musicFile.tags['TRACKNUMBER'][0]
+
+				trackStr = trackStr.split("/")
+				
+				if len(trackStr) == 2 :
+					trackStr[0] = re.sub('[^0-9]+', '', trackStr[0])
+					trackStr[1] = re.sub('[^0-9]+', '', trackStr[1])
+
+					if trackStr[0] != "" and trackStr[1] != "" :
+						self.__trackNum 	= int(trackStr[0])
+						self.__trackCount 	= int(trackStr[1])
 
 		if 'MUSICBRAINZ_TRACKID' in musicFile.tags :
 			self.__mbRecordingID = musicFile.tags['MUSICBRAINZ_TRACKID']
@@ -65,6 +102,10 @@ class MusicTrack :
 
 		if 'GENRE' in musicFile.tags :
 			self.__genres = musicFile.tags['GENRE']
+			genres = []
+			for genre in self.__genres :
+				genres += genre.split("/")
+			self.__genres = genres
 		else :
 			self.__genres = []
 
@@ -199,8 +240,6 @@ class MusicTrack :
 
 	def checkInfo(self) :
 
-		needFileTagsUpdate = False
-
 		if self.__mbRecordingID == [] :
 
 			if self.__identify() :
@@ -216,41 +255,44 @@ class MusicTrack :
 				self.__coverURL = []
 
 				self.__loadMusicBrainzRecording()
-				needFileTagsUpdate = True
 
 		else :
 			if self.__title == [] :
 				self.__loadMusicBrainzRecording()
-				needFileTagsUpdate = True
 
 			elif self.__album == [] :
 				self.__loadMusicBrainzRecording()
-				needFileTagsUpdate = True
 
 			elif self.__artists == [] :
 				self.__loadMusicBrainzRecording()
-				needFileTagsUpdate = True
 
 			elif self.__albumArtist == [] :
 				self.__loadMusicBrainzRecording()
-				needFileTagsUpdate = True
 
 			elif self.__genres == [] :
 				self.__loadMusicBrainzRecording()
-				needFileTagsUpdate = True
 
 			elif self.__language == [] or ( self.__language[0] != "none" and len(self.__language[0]) > 3 ) :
 				self.__language = []
 				self.__loadMusicBrainzRecording()
-				needFileTagsUpdate = True
 
 		if self.__mbReleaseID != [] :
 			if self.__coverURL == [] :
 				self.__loadCoverURL()
 
+			if self.__trackNum == 0 :
+				self.__loadMusicBrainzRelease()
 
-		if needFileTagsUpdate : 
-			self.__updateFileTags()
+			elif self.__trackCount == 0 :
+				self.__loadMusicBrainzRelease()
+
+			elif self.__discNum == 0 :
+				self.__loadMusicBrainzRelease()
+
+			elif self.__discCount == 0 :
+				self.__loadMusicBrainzRelease()
+
+		self.__updateFileTags()
 
 
 	def print(self) :
@@ -260,6 +302,8 @@ class MusicTrack :
 		print("\tALBUM ARTIST : ", 					self.__albumArtist)
 		print("\tARTISTS : ", 						self.__artists)
 		print("\tALBUM : ", 						self.__album)
+		print("\tTRACK NUMBER : ", self.__trackNum, "/", self.__trackCount)
+		print("\tDISC NUMBER : ", self.__discNum, "/", self.__discCount)
 		print("\tTITLE : ", 						self.__title)
 		print("\tGENRES : ", 						self.__genres)
 		print("\tLANGUAGE : ", 						self.__language)
@@ -309,6 +353,13 @@ class MusicTrack :
 		if self.__coverURL != "" :
 			musicFile.tags['COVER_URL'] = self.__coverURL
 
+		if self.__audioFormat == "audio/mpeg" :
+			if self.__trackNum != 0 and self.__trackCount != 0 :
+				musicFile.tags['TRACKNUMBER'] = [str(self.__trackNum)+"/"+str(self.__trackCount)]
+
+			if self.__discNum != 0 and self.__discCount != 0 :
+				musicFile.tags['DISCNUMBER'] = [str(self.__discNum)+"/"+str(self.__discCount)]
+
 		musicFile.save()
 
 	def __identify(self) :
@@ -342,7 +393,7 @@ class MusicTrack :
 		if self.__mbRecordingID != [] :
 
 			if settings.display != "none" and settings.display != "error" :
-				print("\t\033[92mGet track info in MusicBrainz\033[0m")
+				print("\t\033[92mGet Recording info in MusicBrainz\033[0m")
 
 			url = "http://musicbrainz.org/ws/2/recording/" + self.__mbRecordingID[0] + "?inc=artist-credits+releases+genres&fmt=json"
 
@@ -360,7 +411,7 @@ class MusicTrack :
 					MusicTrack.__lastMusicBrainzCall = time.time()
 				except :
 					if settings.display != "none" :
-						print("\t\033[93mWARNING : cover MusicBrainz error, retry in 1 s \033[0m")
+						print("\t\033[93mWARNING : MusicBrainz Recording error, retry in 1 s \033[0m")
 
 					time.sleep(1)
 				else :
@@ -369,7 +420,7 @@ class MusicTrack :
 			
 			if not OK :
 				if settings.display != "none" :
-					print("\t\033[91mERROR : cover MusicBrainz error after 100 retry\033[0m")
+					print("\t\033[91mERROR : MusicBrainz Recording error after 100 retry\033[0m")
 				return
 
 			if response.status_code == 200 :
@@ -480,7 +531,7 @@ class MusicTrack :
 						else :
 							self.__language = "none"
 
-					if 'artist-credit' in oldestRelease and ( self.__mbAlbumArtistID == [] or self.__albumArtist == [] ) :
+					if 'artist-credit' in oldestRelease :
 
 						self.__albumArtist = []
 						self.__mbAlbumArtistID = []
@@ -502,7 +553,70 @@ class MusicTrack :
 
 			else :
 				if settings.display != "none" :
-					print("\t\033[91mERROR : load MusicBrainz info return ", response.status_code, "\033[0m")
+					print("\t\033[91mERROR : load MusicBrainz Recording info return ", response.status_code, "\033[0m")
+
+	def __loadMusicBrainzRelease(self) :
+
+		if self.__mbReleaseID != [] :
+
+			if settings.display != "none" and settings.display != "error" :
+				print("\t\033[92mGet Release info in MusicBrainz\033[0m")
+
+			url = "http://musicbrainz.org/ws/2/release/" + self.__mbReleaseID[0] + "?inc=artist-credits+labels+discids+recordings&fmt=json"
+
+			OK = False
+
+			## GET MusicBrainz Recording json ##
+
+			for tryCount in range(1,100):
+				try:
+					timeSinceLastCall = time.time() - MusicTrack.__lastMusicBrainzCall
+					if timeSinceLastCall < 1.1 :
+						sleep(1.1 - timeSinceLastCall)
+
+					response = requests.get(url)
+					MusicTrack.__lastMusicBrainzCall = time.time()
+				except :
+					if settings.display != "none" :
+						print("\t\033[93mWARNING : MusicBrainz Release error, retry in 1 s \033[0m")
+
+					time.sleep(1)
+				else :
+					OK = True
+					break
+			
+			if not OK :
+				if settings.display != "none" :
+					print("\t\033[91mERROR : MusicBrainz Release error after 100 retry\033[0m")
+				return
+
+			if response.status_code == 200 :
+
+				releaseJSON = response.json()
+
+				if 'media' in releaseJSON :
+					self.__discCount = len(releaseJSON['media'])
+					mediaPos = 0
+					for media in releaseJSON['media'] :
+						mediaPos += 1
+						if 'tracks' in media :
+							for track in media['tracks'] :
+								if 'recording' in track :
+									recording = track['recording']
+									if 'id' in recording and self.__mbRecordingID != [] and recording['id'] == self.__mbRecordingID[0] :
+										if 'position' in track :
+											self.__trackNum = track['position']
+										elif 'number' in track :
+											self.__trackNum = int(track['number'])
+										if 'track-count' in media : 
+											self.__trackCount = media['track-count']
+										self.__discNum = mediaPos
+					self.__discCount = mediaPos
+
+
+			else :
+				if settings.display != "none" :
+					print("\t\033[91mERROR : load MusicBrainz Release info return ", response.status_code, "\033[0m")
 
 	def __loadCoverURL(self) :
 
