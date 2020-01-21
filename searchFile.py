@@ -53,8 +53,10 @@ def clearDir(dirPath) :
 			if len(os.listdir(filePath)) == 0 :
 				os.rmdir(filePath)
 
+		else :
+			fileType = filetype.guess(filePath) ;
 
-		elif not os.path.basename(filePath).lower().endswith(audioExt) or os.path.basename(filePath).startswith('.') :
-			os.remove(filePath)
+			if fileType is None or fileType.mime not in audioType :
+				os.remove(filePath)
 
 	os.chdir("..")

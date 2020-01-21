@@ -487,9 +487,20 @@ class MusicTrack :
 
 			if not os.path.exists(startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt) :
 				os.rename(self.__filePath, startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt)
+				self.__filePath = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
+			else :
+				i=2
 
-			self.__filePath = startDir+"/"+artist+"/"+album+"/"+title+"."+fileExt
+				while True:
+					fileName = startDir+"/"+artist+"/"+album+"/"+title+" ("+str(i)+")."+fileExt
 
+					if self.__filePath == fileName :
+						break
+					elif not os.path.exists(fileName) :
+						os.rename(self.__filePath, fileName)
+						self.__filePath = fileName
+					else :
+						i += 1
 
 	def tag(self) :
 
