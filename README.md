@@ -24,17 +24,15 @@ to identify musics.
 
 used by pyacoustid
 
-#### Install
+#### Install (debian / ubuntu)
 
 `apt install ffmpeg`
 
 ### [MySQL connector](https://dev.mysql.com/doc/connector-python/en/)
 
-#### Install (debian)
+#### Install
 
-download the [deb](https://dev.mysql.com/downloads/connector/python/) file.
-
-`dpkg -i {file}.deb`
+`pip3 install mysql-connector-python`
 
 ## Use
 
