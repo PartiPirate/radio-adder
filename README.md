@@ -28,11 +28,19 @@ used by pyacoustid
 
 `apt install ffmpeg`
 
-### [MySQL connector](https://dev.mysql.com/doc/connector-python/en/)
+### [MySQL connector](https://dev.mysql.com/doc/connector-python/en/connector-python-installation-binary.html)
 
 #### Install
 
 `pip3 install mysql-connector-python`
+
+### [filetype](https://pypi.org/project/filetype/)
+
+to get the type of the files, and check if is a music file.
+
+#### Install
+
+`pip3 install filetype`
 
 ## Use
 
