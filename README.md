@@ -20,7 +20,7 @@ to identify musics.
 
 `pip3 install pyacoustid`
 
-### ffmpeg
+### [ffmpeg](https://ffmpeg.org/)
 
 used by pyacoustid
 
