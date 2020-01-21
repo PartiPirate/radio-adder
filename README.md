@@ -55,7 +55,6 @@ create a `settings.py` file with this variables :
 ```python
 
 display = "short" # all - short - error - none
-tagVersion = "1.3"
 
 acoustIDToken = ""
 
@@ -67,6 +66,9 @@ bdduser 	= "user"
 bddPassword = "password"
 bddName 	= "name"
 
+sortFile = True
+removeUselessFileAndFolder = True
+
 ```
 
 ### display
@@ -77,10 +79,6 @@ Is the detail level on the displaying information.
 - **error** : just error
 - **short** : just short info for each music file (tag state, db state) + error
 - **all** : all details.
-
-### tagVersion
-
-The tag version, if you change this value, all old files are re tag.
 
 ### acoustIDToken
 
@@ -105,3 +103,13 @@ the password of your MySQL service.
 ### bddName
 
 the name of your MySQL database.
+
+### sortFile
+
+Active the auto sorting tool.
+move the file in `Artist/Album/Disc.TrackNumber - Title.mp3`
+
+### removeUselessFileAndFolder
+
+Active the "remove useless" option
+Remove empty folders and non-music files.

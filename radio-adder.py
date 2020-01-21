@@ -41,7 +41,8 @@ for track in result :
 
 	track.checkInfo()
 
-	track.folderSort(startDir)
+	if settings.sortFile :
+		track.folderSort(startDir)
 
 	musicDBInfo = dbTool.getMusicDBInfo(track)
 
@@ -63,6 +64,7 @@ for track in result :
 
 	#print("\tFILE URL : ", track.getFileURL())
 
-searchFile.clearDir(startDir)
+if settings.removeUselessFileAndFolder :
+	searchFile.clearDir(startDir)
 
 #print("FILE : "+result[0].getFilePath())

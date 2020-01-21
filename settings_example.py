@@ -1,6 +1,5 @@
 
 display = "short" # all - short - error - none
-tagVersion = "1.3"
 
 acoustIDToken = ""
 
@@ -11,3 +10,6 @@ bddHost 	= "127.0.0.1"
 bdduser 	= "user"
 bddPassword = "password"
 bddName 	= "name"
+
+sortFile = True
+removeUselessFileAndFolder = True
