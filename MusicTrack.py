@@ -17,8 +17,6 @@ class MusicTrack :
 
 		musicFile = taglib.File(self.__filePath)
 
-		print(musicFile.tags)
-
 		MusicTrack.__lastMusicBrainzCall = 0
 		MusicTrack.__lastCoverCall = 0
 
@@ -405,7 +403,7 @@ class MusicTrack :
 				try:
 					timeSinceLastCall = time.time() - MusicTrack.__lastMusicBrainzCall
 					if timeSinceLastCall < 1.1 :
-						sleep(1.1 - timeSinceLastCall)
+						time.sleep(1.1 - timeSinceLastCall)
 
 					response = requests.get(url)
 					MusicTrack.__lastMusicBrainzCall = time.time()
@@ -572,7 +570,7 @@ class MusicTrack :
 				try:
 					timeSinceLastCall = time.time() - MusicTrack.__lastMusicBrainzCall
 					if timeSinceLastCall < 1.1 :
-						sleep(1.1 - timeSinceLastCall)
+						time.sleep(1.1 - timeSinceLastCall)
 
 					response = requests.get(url)
 					MusicTrack.__lastMusicBrainzCall = time.time()
@@ -631,6 +629,12 @@ class MusicTrack :
 			#print("url : ", infoCoverURL)
 
 			OK = False
+
+			for tryCount in range(1, 100) :
+				try:
+					timeSinceLastCall = time.time() - MusicTrack.__lastCoverCall
+					if timeSinceLastCall < 1.1 :
+						time.sleep(1.1 - timeSinceLastCall)
 
 					infoCoverResponse = requests.get(infoCoverURL)
 					MusicTrack.__lastCoverCall = time.time()
