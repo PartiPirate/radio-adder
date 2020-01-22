@@ -13,3 +13,4 @@ bddName 	= "name"
 
 sortFile = True
 removeUselessFileAndFolder = True
+removeNotFoundFileInDB = True

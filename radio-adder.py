@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
-import searchFile
+import FileTools
 import os
 import settings
 import sys
-import DBTool
+import DBTools
 
 arg = sys.argv
 
@@ -17,9 +17,9 @@ elif not os.path.isdir(arg[1]) :
 
 startDir = arg[1] ;
 
-result = searchFile.searchFile(startDir)
+result = FileTools.searchFile(startDir)
 
-dbTool = DBTool.DBTool()
+dbTools = DBTools.DBTools()
 
 if settings.display != "none" and settings.display != "error" :
 	print(str(len(result))+ " music file find")
@@ -44,16 +44,16 @@ for track in result :
 	if settings.sortFile :
 		track.folderSort(startDir)
 
-	musicDBInfo = dbTool.getMusicDBInfo(track)
+	musicDBInfo = dbTools.getMusicDBInfo(track)
 
 	if   musicDBInfo == "NOT_IN_DB" :
-		dbTool.addMusicInDB(track)
+		dbTools.addMusicInDB(track)
 
 		if settings.display != "none" and settings.display != "error" :
 			print("\t\033[92mAdd track in database\033[0m")
 
 	elif musicDBInfo == "NEED_UPDATE" :
-		dbTool.updateMusicInDB(track)
+		dbTools.updateMusicInDB(track)
 
 		if settings.display != "none" and settings.display != "error" :
 			print("\t\033[95mUpdate track in database\033[0m")
@@ -65,6 +65,9 @@ for track in result :
 	#print("\tFILE URL : ", track.getFileURL())
 
 if settings.removeUselessFileAndFolder :
-	searchFile.clearDir(startDir)
+	FileTools.clearDir(startDir)
+
+if settings.removeNotFoundFileInDB :
+	dbTools.removeNotFoundFileInDB()
 
 #print("FILE : "+result[0].getFilePath())

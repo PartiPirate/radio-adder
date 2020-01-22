@@ -1,8 +1,10 @@
 
 import mysql.connector
 import settings
+import os
+import urllib
 
-class DBTool :
+class DBTools :
 
 	def __init__(self) :
 
@@ -135,5 +137,59 @@ class DBTool :
 
 		self.__db.commit()
 		cursor.close()
+
+	def removeNotFoundFileInDB(self) :
+
+		if not self.__db.is_connected() :
+			self.__db.reconnect()
+
+		cursor = self.__db.cursor()
+
+		operation = "SELECT tra_id, tra_url FROM tracks ;"
+
+		try :
+			cursor.execute(operation)
+		except :
+			if settings.display != "none" :
+				print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
+			return "ERROR"
+
+		rows = cursor.fetchall()
+
+		cursor.close()
+
+		for row in rows :
+			fileURL = row[1]
+
+			if fileURL.startswith(settings.webServiceURL) :
+				fileURL = fileURL[len(settings.webServiceURL):]
+
+			fileURL = urllib.parse.unquote(fileURL)
+
+			fileURL = os.path.abspath(settings.webServiceRacinePath) + "/" + fileURL
+			fileURL = os.path.abspath(fileURL)
+
+			if not os.path.exists(fileURL) :
+
+				cursor = self.__db.cursor()
+
+				operation = "DELETE FROM tracks WHERE tra_id = %(id)s ;"
+
+				data = {}
+				data['id'] = row[0]
+
+				try :
+					cursor.execute(operation, data)
+				except :
+					if settings.display != "none" :
+						print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
+					return "ERROR"
+				else :
+					if settings.display != "none" and settings.display != "error" :
+						print("\033[93mRemove track from the DB : ", fileURL, "\033[0m")
+
+				cursor.close()
+
+
 
 

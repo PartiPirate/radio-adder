@@ -68,6 +68,7 @@ bddName 	= "name"
 
 sortFile = True
 removeUselessFileAndFolder = True
+removeNotFoundFileInDB = True
 
 ```
 
@@ -113,3 +114,7 @@ move the file in `Artist/Album/Disc.TrackNumber - Title.mp3`
 
 Active the "remove useless" option
 Remove empty folders and non-music files.
+
+### removeNotFoundFileInDB
+
+Remove database rows where music file not existing.

@@ -54,7 +54,7 @@ def clearDir(dirPath) :
 			if len(os.listdir(filePath)) == 0 :
 				os.rmdir(filePath)
 				if settings.display != "none" and settings.display != "error" :
-					print("\033[93mRemove ", filePath, "\033[0m")
+					print("\033[93mRemove Folder ", filePath, "\033[0m")
 
 		else :
 			fileType = filetype.guess(filePath) ;
@@ -62,6 +62,6 @@ def clearDir(dirPath) :
 			if fileType is None or fileType.mime not in audioType :
 				os.remove(filePath)
 				if settings.display != "none" and settings.display != "error" :
-					print("\033[93mRemove ", filePath, "\033[0m")
+					print("\033[93mRemove File ", filePath, "\033[0m")
 
 	os.chdir("..")
