@@ -151,7 +151,7 @@ class DBTools :
 			cursor.execute(operation)
 		except :
 			if settings.display != "none" :
-				print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
+				print("\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
 			return "ERROR"
 
 		rows = cursor.fetchall()
@@ -182,12 +182,13 @@ class DBTools :
 					cursor.execute(operation, data)
 				except :
 					if settings.display != "none" :
-						print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
+						print("\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
 					return "ERROR"
 				else :
 					if settings.display != "none" and settings.display != "error" :
-						print("\033[93mRemove track from the DB : ", fileURL, "\033[0m")
+						print("\033[93mRemove track from DB : ", fileURL, "\033[0m")
 
+				self.__db.commit()
 				cursor.close()
 
 

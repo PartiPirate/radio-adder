@@ -282,6 +282,12 @@ class MusicTrack :
 				self.__genres = []
 				self.__language = []
 				self.__coverURL = []
+				self.__language = []
+				self.__coverURL = []
+				self.__trackNum = 0
+				self.__trackCount = 0
+				self.__discNum = 0
+				self.__discCount = 0
 
 				self.__loadMusicBrainzRecording()
 
@@ -419,17 +425,23 @@ class MusicTrack :
 
 			if len(data['results']) <= 0 :
 				if settings.display != "none" :
-					print("\t\033[91mERROR : unknown music\033[0m")
+					print("\t\033[33mWARNING : unknown music\033[0m")
 				return False
 
 			for results in data['results'] :
 				if 'recordings' in results :
 					self.__mbRecordingID = [results['recordings'][0]['id']]
-				return True
+					return True
+				else :
+					if settings.display != "none" :
+						print("\t\033[33mWARNING : unknown music\033[0m")
+
+					return False
+
 
 		else :
 			if settings.display != "none" :
-				print("\t\033[91mERROR : unknown music\033[0m")
+				print("\t\033[33mWARNING : unknown music\033[0m")
 			return False
 
 	def __loadMusicBrainzRecording(self) :
@@ -571,9 +583,12 @@ class MusicTrack :
 
 					if self.__language == [] :
 						if 'text-representation' in oldestRelease and 'language' in oldestRelease['text-representation'] :
-							self.__language = [oldestRelease['text-representation']['language']]
+							if oldestRelease['text-representation']['language'] != None :
+								self.__language = [oldestRelease['text-representation']['language']]
+							else :
+								self.__language = ["none"]
 						else :
-							self.__language = "none"
+							self.__language = ["none"]
 
 					if 'artist-credit' in oldestRelease :
 
