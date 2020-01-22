@@ -1,6 +1,7 @@
 import os
 import MusicTrack
 import filetype
+import settings
 
 audioExt = ('mp3', 'flac', 'ogg')
 audioType = ('audio/mpeg', 'audio/ogg', 'audio/x-flac')
@@ -52,11 +53,15 @@ def clearDir(dirPath) :
 
 			if len(os.listdir(filePath)) == 0 :
 				os.rmdir(filePath)
+				if settings.display != "none" and settings.display != "error" :
+					print("\033[93mRemove ", filePath, "\033[0m")
 
 		else :
 			fileType = filetype.guess(filePath) ;
 
 			if fileType is None or fileType.mime not in audioType :
 				os.remove(filePath)
+				if settings.display != "none" and settings.display != "error" :
+					print("\033[93mRemove ", filePath, "\033[0m")
 
 	os.chdir("..")

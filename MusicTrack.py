@@ -455,7 +455,7 @@ class MusicTrack :
 					MusicTrack.__lastMusicBrainzCall = time.time()
 				except :
 					if settings.display != "none" :
-						print("\t\033[93mWARNING : MusicBrainz Recording error, retry in 1 s \033[0m")
+						print("\t\033[33mWARNING : MusicBrainz Recording error, retry in 1 s \033[0m")
 
 					time.sleep(1)
 				else :
@@ -622,7 +622,7 @@ class MusicTrack :
 					MusicTrack.__lastMusicBrainzCall = time.time()
 				except :
 					if settings.display != "none" :
-						print("\t\033[93mWARNING : MusicBrainz Release error, retry in 1 s \033[0m")
+						print("\t\033[33mWARNING : MusicBrainz Release error, retry in 1 s \033[0m")
 
 					time.sleep(1)
 				else :
@@ -686,7 +686,7 @@ class MusicTrack :
 					MusicTrack.__lastCoverCall = time.time()
 				except :
 					if settings.display != "none" :
-						print("\t\033[93mWARNING : cover request error, retry in 1 s \033[0m")
+						print("\t\033[33mWARNING : cover request error, retry in 1 s \033[0m")
 
 					time.sleep(1)
 				else :
@@ -749,7 +749,7 @@ class MusicTrack :
 				self.__coverURL = "no cover"
 
 				if settings.display != "none" :
-					print("\t\033[93mWARNING : no cover (", infoCoverResponse.status_code, " - url:", infoCoverURL, ")\033[0m")
+					print("\t\033[33mWARNING : no cover (", infoCoverResponse.status_code, " - url:", infoCoverURL, ")\033[0m")
 	
 	def folderSort(self, startDir) :
 
@@ -799,6 +799,10 @@ class MusicTrack :
 			if not os.path.exists(fileName) :
 				os.rename(self.__filePath, fileName)
 				self.__filePath = fileName
+
+				if settings.display != "none" and settings.display != "error" :
+					print("\t\033[92mRename file as ", fileName, "\033[0m")
+
 			else :
 				i=2
 
@@ -819,6 +823,9 @@ class MusicTrack :
 					elif not os.path.exists(fileName) :
 						os.rename(self.__filePath, fileName)
 						self.__filePath = fileName
+
+						if settings.display != "none" and settings.display != "error" :
+							print("\t\033[92mRename file as ", fileName, "\033[0m")
+
 					else :
 						i += 1
-			
