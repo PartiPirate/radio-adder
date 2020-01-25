@@ -15,3 +15,5 @@ retagFile = True
 sortFile = True
 removeUselessFileAndFolder = True
 removeNotFoundFileInDB = True
+
+forceAcoustID = False

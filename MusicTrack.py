@@ -269,6 +269,10 @@ class MusicTrack :
 
 	def checkInfo(self) :
 
+		if settings.forceAcoustID :
+			self.__mbRecordingID = []
+
+
 		if self.__mbRecordingID == [] :
 
 			if self.__identify() :

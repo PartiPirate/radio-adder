@@ -71,6 +71,8 @@ sortFile = True
 removeUselessFileAndFolder = True
 removeNotFoundFileInDB = True
 
+forceAcoustID = False
+
 ```
 
 ### display
@@ -123,3 +125,7 @@ Remove empty folders and non-music files.
 ### removeNotFoundFileInDB
 
 Remove database rows where music file not existing.
+
+### forceAcoustID
+
+Force to recognize music using AcoustID on every files. 
