@@ -431,19 +431,73 @@ class MusicTrack :
 
 			for results in data['results'] :
 				if 'recordings' in results :
-					self.__mbRecordingID = [results['recordings'][0]['id']]
-					return True
-				else :
-					if settings.display != "none" :
-						print("\t\033[33mWARNING : unknown music\033[0m")
+					savedRecording = None
 
-					return False
+					for recording in results['recordings'] :
 
+						if savedRecording == None :
+							savedRecording = recording
+							continue
+
+						else :
+
+							# Test : Duration
+							if recording['duration'] == self.__duration :
+								if savedRecording['duration'] != self.__duration :
+									savedRecording = recording
+									continue
+							elif savedRecording['duration'] == self.__duration :
+								continue
+
+							# Test : title - tag title
+							if recording['title'].lower() in self.__title.lower() :
+								if savedRecording['title'].lower() not in self.__title.lower() :
+									savedRecording = recording
+									continue
+							elif savedRecording['title'].lower() in self.__title.lower() :
+								continue
+
+							# Test : artist - tag artist
+							if self.__AcoustIDArtistsSearch(recording['artists'], self.__artists) :
+								if not self.__AcoustIDArtistsSearch(savedRecording['artists'], self.__artists) :
+									savedRecording = recording
+									continue
+							elif self.__AcoustIDArtistsSearch(savedRecording['artists'], self.__artists) :
+								continue
+
+							# Test : title - file name
+							if recording['title'].lower() in self.__filePath.lower() :
+								if savedRecording['title'].lower() not in self.__filePath.lower() :
+									savedRecording = recording
+									continue
+							elif savedRecording['title'].lower() in self.__filePath.lower() :
+								continue
+
+							# Test : artist - file name
+							if self.__AcoustIDArtistsSearch(recording['artists'], [self.__filePath]) :
+								if not self.__AcoustIDArtistsSearch(savedRecording['artists'], [self.__filePath]) :
+									savedRecording = recording
+									continue
+							elif self.__AcoustIDArtistsSearch(savedRecording['artists'], [self.__filePath]) :
+								continue
+
+					if savedRecording != None :
+						self.__mbRecordingID = [savedRecording['id']]
+						return True
+						
 
 		else :
 			if settings.display != "none" :
 				print("\t\033[33mWARNING : unknown music\033[0m")
 			return False
+
+	def __AcoustIDArtistsSearch(aIDArtists, listArtists):
+
+		for aIDArtist in aIDArtists :
+			for artist in listArtists :
+				if aIDArtist['name'].lower() == artist.lower() :
+					return True
+		return False
 
 	def __loadMusicBrainzRecording(self) :
 
