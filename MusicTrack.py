@@ -446,44 +446,49 @@ class MusicTrack :
 						else :
 
 							# Test : Duration
-							if recording['duration'] == self.__duration :
-								if savedRecording['duration'] != self.__duration :
-									savedRecording = recording
+							if 'duration' in recording and 'duration' in savedRecording :
+								if recording['duration'] == self.__duration :
+									if savedRecording['duration'] != self.__duration :
+										savedRecording = recording
+										continue
+								elif savedRecording['duration'] == self.__duration :
 									continue
-							elif savedRecording['duration'] == self.__duration :
-								continue
 
 							# Test : title - tag title
-							if recording['title'].lower() in self.__title.lower() :
-								if savedRecording['title'].lower() not in self.__title.lower() :
-									savedRecording = recording
+							if self.__title != [] and 'title' in recording and 'title' in savedRecording :
+								if recording['title'].lower() in self.__title[0].lower() :
+									if savedRecording['title'].lower() not in self.__title[0].lower() :
+										savedRecording = recording
+										continue
+								elif savedRecording['title'].lower() in self.__title[0].lower() :
 									continue
-							elif savedRecording['title'].lower() in self.__title.lower() :
-								continue
 
 							# Test : artist - tag artist
-							if self.__AcoustIDArtistsSearch(recording['artists'], self.__artists) :
-								if not self.__AcoustIDArtistsSearch(savedRecording['artists'], self.__artists) :
-									savedRecording = recording
+							if 'artists' in recording and 'artists' in savedRecording :
+								if self.__AcoustIDArtistsSearch(recording['artists'], self.__artists) :
+									if not self.__AcoustIDArtistsSearch(savedRecording['artists'], self.__artists) :
+										savedRecording = recording
+										continue
+								elif self.__AcoustIDArtistsSearch(savedRecording['artists'], self.__artists) :
 									continue
-							elif self.__AcoustIDArtistsSearch(savedRecording['artists'], self.__artists) :
-								continue
 
 							# Test : title - file name
-							if recording['title'].lower() in self.__filePath.lower() :
-								if savedRecording['title'].lower() not in self.__filePath.lower() :
-									savedRecording = recording
+							if 'title' in recording and 'title' in savedRecording :
+								if recording['title'].lower() in self.__filePath.lower() :
+									if savedRecording['title'].lower() not in self.__filePath.lower() :
+										savedRecording = recording
+										continue
+								elif savedRecording['title'].lower() in self.__filePath.lower() :
 									continue
-							elif savedRecording['title'].lower() in self.__filePath.lower() :
-								continue
 
 							# Test : artist - file name
-							if self.__AcoustIDArtistsSearch(recording['artists'], [self.__filePath]) :
-								if not self.__AcoustIDArtistsSearch(savedRecording['artists'], [self.__filePath]) :
-									savedRecording = recording
+							if 'artists' in recording and 'artists' in savedRecording :
+								if self.__AcoustIDArtistsSearch(recording['artists'], [self.__filePath]) :
+									if not self.__AcoustIDArtistsSearch(savedRecording['artists'], [self.__filePath]) :
+										savedRecording = recording
+										continue
+								elif self.__AcoustIDArtistsSearch(savedRecording['artists'], [self.__filePath]) :
 									continue
-							elif self.__AcoustIDArtistsSearch(savedRecording['artists'], [self.__filePath]) :
-								continue
 
 					if savedRecording != None :
 						self.__mbRecordingID = [savedRecording['id']]
@@ -495,7 +500,7 @@ class MusicTrack :
 				print("\t\033[33mWARNING : unknown music\033[0m")
 			return False
 
-	def __AcoustIDArtistsSearch(aIDArtists, listArtists):
+	def __AcoustIDArtistsSearch(self, aIDArtists, listArtists):
 
 		for aIDArtist in aIDArtists :
 			for artist in listArtists :
