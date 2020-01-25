@@ -327,7 +327,8 @@ class MusicTrack :
 			elif self.__discCount == 0 :
 				self.__loadMusicBrainzRelease()
 
-		self.__updateFileTags()
+		if settings.retagFile :
+			self.__updateFileTags()
 
 
 	def print(self) :

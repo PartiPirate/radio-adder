@@ -66,6 +66,7 @@ bdduser 	= "user"
 bddPassword = "password"
 bddName 	= "name"
 
+retagFile = True
 sortFile = True
 removeUselessFileAndFolder = True
 removeNotFoundFileInDB = True
@@ -104,6 +105,10 @@ the password of your MySQL service.
 ### bddName
 
 the name of your MySQL database.
+
+### retagFile
+
+Activate writing the music tags.
 
 ### sortFile
 

@@ -11,6 +11,7 @@ bdduser 	= "user"
 bddPassword = "password"
 bddName 	= "name"
 
+retagFile = True
 sortFile = True
 removeUselessFileAndFolder = True
 removeNotFoundFileInDB = True
