@@ -46,11 +46,11 @@ to get the type of the files, and check if is a music file.
 
 `./radio-adder.py [Directory]`
 
-`[Directory]` : the music directory 
+`[Directory]` : the music directory
 
 ## Settings
 
-create a `settings.py` file with this variables : 
+create a `settings.py` file with this variables :
 
 ```python
 
@@ -70,6 +70,8 @@ retagFile = True
 sortFile = True
 removeUselessFileAndFolder = True
 removeNotFoundFileInDB = True
+
+updateDirection = "DBtoFile"
 
 forceAcoustID = False
 
@@ -126,6 +128,15 @@ Remove empty folders and non-music files.
 
 Remove database rows where music file not existing.
 
+### updateDirection
+
+Chose if the file update direction.
+
+- **DBtoFile** : the file tags are update using the DB.
+- **FiletoDB** : the DB are update using file tags.
+
+For file not in the DB, the direction is always in File to DB direction.
+
 ### forceAcoustID
 
-Force to recognize music using AcoustID on every files. 
+Force to recognize music using AcoustID on every files.

@@ -36,7 +36,7 @@ class MusicTrack :
 				discStr = musicFile.tags['DISCNUMBER'][0]
 
 				discStr = discStr.split("/")
-				
+
 				if len(discStr) == 2 :
 					discStr[0] = re.sub('[^0-9]+', '', discStr[0])
 					discStr[1] = re.sub('[^0-9]+', '', discStr[1])
@@ -49,7 +49,7 @@ class MusicTrack :
 				trackStr = musicFile.tags['TRACKNUMBER'][0]
 
 				trackStr = trackStr.split("/")
-				
+
 				if len(trackStr) == 2 :
 					trackStr[0] = re.sub('[^0-9]+', '', trackStr[0])
 					trackStr[1] = re.sub('[^0-9]+', '', trackStr[1])
@@ -157,7 +157,7 @@ class MusicTrack :
 		fileURL = os.path.relpath(self.__filePath, settings.webServiceRacinePath)
 
 		fileURL = urllib.parse.quote(fileURL)
-		
+
 		if settings.webServiceURL.endswith('/') :
 			fileURL = settings.webServiceURL + fileURL
 		else :
@@ -177,6 +177,11 @@ class MusicTrack :
 
 		return self.__free
 
+	def setFree(self, free):
+
+		if free is True or free is False:
+			self.__free = free
+
 	def getDuration(self) :
 
 		return self.__duration
@@ -189,6 +194,12 @@ class MusicTrack :
 		else :
 			return self.__title[0]
 
+	def setTitle(self, title) :
+
+		if type(title) is str:
+			self.__title = [title]
+			self.__updateFileTags()
+
 	def getAlbumArtist(self) :
 
 		if self.__albumArtist == [] :
@@ -197,19 +208,30 @@ class MusicTrack :
 		else :
 			return self.__albumArtist[0]
 
+	def setAlbumArtist(self, albumArtist) :
+
+		if type(albumArtist) is str:
+			self.__albumArtist = [albumArtist]
+			self.__updateFileTags()
+
 	def getArtists(self) :
 
 		first = True
 		output = ""
 
 		for title in self.__artists :
-
 			if not first :
 				output += ", "
 
 			output += title
-		
+
 		return output ;
+
+	def setArtists(self, artists) :
+
+		if type(artists) is str:
+			self.__artists = artists.split(", ")
+			self.__updateFileTags()
 
 	def getAlbum(self) :
 
@@ -218,6 +240,12 @@ class MusicTrack :
 
 		else :
 			return self.__album[0]
+
+	def setAlbum(self, album) :
+
+		if type(album) is str:
+			self.__album = [album]
+			self.__updateFileTags()
 
 	def getGenres(self) :
 
@@ -232,8 +260,14 @@ class MusicTrack :
 			output += title
 
 			first = False
-		
+
 		return output ;
+
+	def setGenres(self, genres) :
+
+		if type(genres) is str:
+			self.__genres = genres.split(", ")
+			self.__updateFileTags()
 
 	def getRecordingID(self) :
 
@@ -265,7 +299,7 @@ class MusicTrack :
 			return ""
 
 		else :
-			return self.__mbArtistsID[0] 
+			return self.__mbArtistsID[0]
 
 	def checkInfo(self) :
 
@@ -358,7 +392,7 @@ class MusicTrack :
 
 	def __updateFileTags(self) :
 
-		musicFile = taglib.File(self.__filePath) 
+		musicFile = taglib.File(self.__filePath)
 
 		if self.__albumArtist != [] :
 			musicFile.tags['ALBUMARTIST'] = self.__albumArtist
@@ -493,7 +527,7 @@ class MusicTrack :
 					if savedRecording != None :
 						self.__mbRecordingID = [savedRecording['id']]
 						return True
-						
+
 
 		else :
 			if settings.display != "none" :
@@ -537,7 +571,7 @@ class MusicTrack :
 				else :
 					OK = True
 					break
-			
+
 			if not OK :
 				if settings.display != "none" :
 					print("\t\033[91mERROR : MusicBrainz Recording error after 100 retry\033[0m")
@@ -626,7 +660,7 @@ class MusicTrack :
 								date = datetime.date.today()
 
 							if date < oldestDate :
-								oldestDate = date 
+								oldestDate = date
 								oldestRelease = release
 
 						else :
@@ -707,7 +741,7 @@ class MusicTrack :
 				else :
 					OK = True
 					break
-			
+
 			if not OK :
 				if settings.display != "none" :
 					print("\t\033[91mERROR : MusicBrainz Release error after 100 retry\033[0m")
@@ -731,7 +765,7 @@ class MusicTrack :
 											self.__trackNum = track['position']
 										elif 'number' in track :
 											self.__trackNum = int(track['number'])
-										if 'track-count' in media : 
+										if 'track-count' in media :
 											self.__trackCount = media['track-count']
 										self.__discNum = mediaPos
 					self.__discCount = mediaPos
@@ -742,7 +776,6 @@ class MusicTrack :
 					print("\t\033[91mERROR : load MusicBrainz Release info return ", response.status_code, "\033[0m")
 
 	def __loadCoverURL(self) :
-
 
 		if settings.display != "none" and settings.display != "error" :
 			print("\t\033[92mGet album cover URL\033[0m")
@@ -771,7 +804,7 @@ class MusicTrack :
 				else :
 					OK = True
 					break
-			
+
 			if not OK :
 				if settings.display != "none" :
 					print("\t\033[91mERROR : cover request error after 100 retry\033[0m")
@@ -792,7 +825,7 @@ class MusicTrack :
 									infoImage = image
 									break
 
-				
+
 				if infoImage != None :
 					startCoverURL = ""
 
@@ -824,12 +857,12 @@ class MusicTrack :
 								print("\t\033[91mERROR : get final cover URL return ", startCoverURLResponse.url, "\033[0m")
 
 
-			else : 
+			else :
 				self.__coverURL = "no cover"
 
 				if settings.display != "none" :
 					print("\t\033[33mWARNING : no cover (", infoCoverResponse.status_code, " - url:", infoCoverURL, ")\033[0m")
-	
+
 	def folderSort(self, startDir) :
 
 		startDir = os.path.abspath(startDir)
@@ -841,7 +874,7 @@ class MusicTrack :
 
 		fileExt = fileBaseName.split(".")[-1]
 
-		if self.__albumArtist != [] : 
+		if self.__albumArtist != [] :
 			artist = self.__albumArtist[0].replace("/", "")
 
 		if self.__album != [] :

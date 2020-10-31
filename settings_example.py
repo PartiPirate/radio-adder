@@ -16,4 +16,6 @@ sortFile = True
 removeUselessFileAndFolder = True
 removeNotFoundFileInDB = True
 
+updateDirection = "DBtoFile" # DBtoFile | FiletoDB
+
 forceAcoustID = False

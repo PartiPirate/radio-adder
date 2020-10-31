@@ -8,7 +8,7 @@ class DBTools :
 
 	def __init__(self) :
 
-		self.__db = mysql.connector.connect(	host=settings.bddHost,  		# your host 
+		self.__db = mysql.connector.connect(	host=settings.bddHost,  		# your host
                      							user=settings.bdduser,       	# username
                      							passwd=settings.bddPassword,    # password
                      							db=settings.bddName)   			# name of the database
@@ -30,7 +30,7 @@ class DBTools :
 				print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
 			return "ERROR"
 
-		rowCount = 0 
+		rowCount = 0
 
 		for row in cursor.fetchall() :
 			rowCount += 1
@@ -72,7 +72,7 @@ class DBTools :
 
 		#bytes(test, 'utf-8')
 
-		insert_stmt = (	
+		insert_stmt = (
 			"INSERT INTO tracks (tra_url, tra_title, tra_author, tra_album, tra_duration, tra_genres, tra_free) "
 			"VALUES (%(url)s, %(title)s, %(author)s, %(album)s, %(duration)s, %(genres)s, %(free)s) ;"
 		)
@@ -96,6 +96,41 @@ class DBTools :
 		self.__db.commit()
 		cursor.close()
 
+	def updateMusicFromDB(self, musicTrack) :
+
+		if not self.__db.is_connected() :
+			self.__db.reconnect()
+
+		cursor = self.__db.cursor()
+
+		operation = "SELECT tra_title, tra_author, tra_album, tra_genres, tra_free FROM tracks WHERE tra_url = %(url)s ;"
+		params = { 'url': musicTrack.getFileURL() }
+
+		try :
+			cursor.execute(operation, params)
+		except :
+			if settings.display != "none" :
+				print("\t\033[91mERROR : bdd execution, statement : ", cursor.statement, "\033[0m")
+
+		rowCount = 0
+		for row in cursor.fetchall() :
+			rowCount += 1
+
+
+		if rowCount == 1 :
+
+			musicTrack.setTitle(row[0])
+			musicTrack.setAlbumArtist(row[1])
+			musicTrack.setAlbum(row[2])
+			musicTrack.setGenres(row[3])
+
+			if row[4] is 0 :
+				musicTrack.setFree(False)
+			else :
+				musicTrack.setFree(True)
+
+		cursor.close()
+
 	def updateMusicInDB(self, musicTrack) :
 
 		if not self.__db.is_connected() :
@@ -108,7 +143,7 @@ class DBTools :
 		# UPDATE `tracks` SET `tra_title`='Antauparolo de Prapatra Kaciko', `tra_author`='BaRok\' Projeto', `tra_duration`='236' WHERE `tra_id`='1';
 
 
-		insert_stmt = (	
+		insert_stmt = (
 			"UPDATE `tracks` SET "
 			"`tra_title`=%(title)s, "
 			"`tra_author`=%(author)s, "
@@ -190,7 +225,3 @@ class DBTools :
 
 				self.__db.commit()
 				cursor.close()
-
-
-
-

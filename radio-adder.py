@@ -53,10 +53,22 @@ for track in result :
 			print("\t\033[92mAdd track in database\033[0m")
 
 	elif musicDBInfo == "NEED_UPDATE" :
-		dbTools.updateMusicInDB(track)
 
-		if settings.display != "none" and settings.display != "error" :
-			print("\t\033[95mUpdate track in database\033[0m")
+		if settings.updateDirection is "FiletoDB":
+
+			dbTools.updateMusicInDB(track)
+
+			if settings.display != "none" and settings.display != "error" :
+				print("\t\033[95mUpdate track in database\033[0m")
+
+		elif settings.updateDirection is "DBtoFile":
+
+			dbTools.updateMusicFromDB(track)
+
+			if settings.display != "none" and settings.display != "error" :
+				print("\t\033[95mUpdate track from database\033[0m")
+
+
 
 
 	if settings.display == "all" :
