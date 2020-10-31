@@ -866,9 +866,9 @@ class MusicTrack :
 	def folderSort(self, startDir) :
 
 		startDir = os.path.abspath(startDir)
-		artist 	= "Unknown"
-		album 	= "Unknown"
-		title 	= "Unknown"
+		artist 	= ""
+		album 	= ""
+		title 	= ""
 
 		fileBaseName = os.path.basename(self.__filePath)
 
@@ -883,10 +883,44 @@ class MusicTrack :
 		if self.__title != [] :
 			title = self.__title[0].replace("/", "")
 
+		fileName = 	startDir + "/"
 
-		fileName = 	startDir
-		fileName += "/"+artist
-		fileName += "/"+album+"/"
+		if artist is "":
+
+			fileName += "Unknown/"
+
+			if not os.path.exists(fileName) :
+				os.mkdir(fileName)
+
+			fileName += fileBaseName
+			os.rename(self.__filePath, fileName)
+
+			return
+
+		fileName += artist + "/"
+
+		if album is "":
+
+			fileName += "Unknown/"
+
+			if not os.path.exists(fileName) :
+				os.mkdir(fileName)
+
+			fileName += fileBaseName
+			os.rename(self.__filePath, fileName)
+			return
+
+		fileName += album + "/"
+
+		if title is "":
+			fileName += "Unknown/"
+
+			if not os.path.exists(fileName) :
+				os.mkdir(fileName)
+
+			fileName += fileBaseName
+			os.rename(self.__filePath, fileName)
+			return
 
 		if self.__discNum != 0 :
 			fileName += str(self.__discNum) + "."
