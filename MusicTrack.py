@@ -894,6 +894,7 @@ class MusicTrack :
 
 			fileName += fileBaseName
 			os.rename(self.__filePath, fileName)
+			self.__filePath = fileName
 
 			return
 
@@ -908,6 +909,8 @@ class MusicTrack :
 
 			fileName += fileBaseName
 			os.rename(self.__filePath, fileName)
+			self.__filePath = fileName
+			
 			return
 
 		fileName += album + "/"

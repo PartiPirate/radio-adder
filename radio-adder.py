@@ -64,6 +64,8 @@ for track in result :
 		elif settings.updateDirection is "DBtoFile":
 
 			dbTools.updateMusicFromDB(track)
+			track.folderSort(startDir)
+			dbTools.addMusicInDB(track)
 
 			if settings.display != "none" and settings.display != "error" :
 				print("\t\033[95mUpdate track from database\033[0m")
