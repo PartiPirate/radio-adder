@@ -455,8 +455,12 @@ class MusicTrack :
 
 		if settings.display != "none" and settings.display != "error" :
 			print("\t\033[96mIdentify track in AcoustID database\033[0m")
-
-		data = acoustid.match(settings.acoustIDToken, self.__filePath, parse=False)
+                
+                try:
+		    data = acoustid.match(settings.acoustIDToken, self.__filePath, parse=False)
+                except:
+                    print("\t\033[33mWARNING : AcoustID match failed\033[0m")
+                    return False
 
 		#recordingID = data['results'][0]['recordings'][0]['id']
 
