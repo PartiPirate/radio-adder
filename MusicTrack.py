@@ -455,7 +455,7 @@ class MusicTrack :
 
 		if settings.display != "none" and settings.display != "error" :
 			print("\t\033[96mIdentify track in AcoustID database\033[0m")
-                
+
                 try:
 		    data = acoustid.match(settings.acoustIDToken, self.__filePath, parse=False)
                 except:

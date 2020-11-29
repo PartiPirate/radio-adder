@@ -180,7 +180,7 @@ class DBTools :
 
 		cursor = self.__db.cursor()
 
-		operation = "SELECT tra_id, tra_url FROM tracks ;"
+		operation = "SELECT tra_id, tra_url FROM tracks WHERE tra_is_podcast=0 ;"
 
 		try :
 			cursor.execute(operation)
