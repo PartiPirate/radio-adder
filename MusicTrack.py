@@ -45,7 +45,7 @@ class MusicTrack :
                                                 self.__discNum          = int(discStr[0])
                                                 self.__discCount        = int(discStr[1])
 
-                        if 'TRACKNUMBER' in musicFile.tags :
+                        if 'TRACKNUMBER' in musicFile.tags and musicFile.tags['TRACKNUMBER'] != [] :
                                 trackStr = musicFile.tags['TRACKNUMBER'][0]
 
                                 trackStr = trackStr.split("/")
